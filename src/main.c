@@ -28,6 +28,23 @@ int main() {
         running = false;
         break;
 
+      case SDL_KEYDOWN:
+
+        switch (event.key.keysym.sym) {
+
+        case SDLK_ESCAPE:
+          running = false;
+          break;
+
+        default:
+          printf("Unhandled Key: %d\n", event.key.keysym.sym);
+          break;
+        }
+        break;
+
+      case SDL_POLLSENTINEL:
+        break;
+
       default:
         printf("Unhandled Event: %d\n", event.type);
         break;
