@@ -21,6 +21,8 @@ int main() {
   SDL_Event event;
   bool running = true;
   while (running) {
+    Uint32 begin = SDL_GetTicks();
+
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
 
@@ -54,6 +56,12 @@ int main() {
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
     SDL_RenderPresent(renderer);
+
+    Uint32 end = SDL_GetTicks();
+    int delay = 1000 / 30 - (end - begin);
+    if (delay > 0) {
+      SDL_Delay(delay);
+    }
   }
   SDL_DestroyTexture(texture);
   SDL_DestroyRenderer(renderer);
