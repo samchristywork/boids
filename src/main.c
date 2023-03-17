@@ -55,6 +55,17 @@ int main() {
 
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
+
+    SDL_Rect rectToDraw = {100, 100, 100, 100};
+
+    SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0);
+    SDL_RenderFillRect(renderer, &rectToDraw);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0xff, 0, 0);
+    SDL_RenderDrawRect(renderer, &rectToDraw);
+
+    SDL_RenderDrawLine(renderer, 0, 0, 100, 100);
+
     SDL_RenderPresent(renderer);
 
     Uint32 end = SDL_GetTicks();
