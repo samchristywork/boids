@@ -16,7 +16,14 @@ struct boid {
   float x;
   float y;
   float current_heading;
+  float rule1_heading;
+  float rule2_heading;
+  float rule3_heading;
 } boids[NUM_BOIDS];
+
+float randFloat(float low, float high) {
+  return low + (high - low) * (float)rand() / (float)RAND_MAX;
+}
 
 void initialize_positions() {
   for (int i = 0; i < NUM_BOIDS; i++) {
@@ -86,6 +93,32 @@ void draw_boids(SDL_Renderer *renderer, bool debug_view) {
   }
 }
 
+float boid_dist_2(int a, int b) {
+  float dx = boids[a].x - boids[b].x;
+  float dy = boids[a].y - boids[b].y;
+
+  return dx * dx + dy * dy;
+}
+
+// TODO: less efficient
+float boid_dist(int a, int b) { return sqrt(boid_dist_2(a, b)); }
+
+// separation: steer to avoid crowding local flockmates
+void rule1(int idx) {
+  boids[idx].rule1_heading = boids[idx].current_heading;
+}
+
+// alignment: steer towards the average heading of local flockmates
+void rule2(int idx) {
+  boids[idx].rule2_heading = boids[idx].current_heading;
+}
+
+// cohesion: steer to move towards the average position (center of mass) of
+// local flockmates
+void rule3(int idx) {
+  boids[idx].rule3_heading = boids[idx].current_heading;
+}
+
 void simulate_boids() {
   for (int i = 0; i < NUM_BOIDS; i++) {
 
@@ -104,17 +137,27 @@ void simulate_boids() {
   }
 
   for (int i = 0; i < NUM_BOIDS; i++) {
-    // rule1(i);
-    // rule2(i);
-    // rule3(i);
+    rule1(i);
+    rule2(i);
+    rule3(i);
   }
 
   for (int i = 0; i < NUM_BOIDS; i++) {
 
     float heading_weight = 1.0;
+    float rule1_weight = 0.0;
+    float rule2_weight = 0.0;
+    float rule3_weight = 0.0;
 
-    float new_x = heading_weight * cos(boids[i].current_heading);
-    float new_y = heading_weight * sin(boids[i].current_heading);
+    float new_x = heading_weight * cos(boids[i].current_heading) +
+                  rule1_weight * cos(boids[i].rule1_heading) +
+                  rule2_weight * cos(boids[i].rule2_heading) +
+                  rule3_weight * cos(boids[i].rule3_heading);
+
+    float new_y = heading_weight * sin(boids[i].current_heading) +
+                  rule1_weight * sin(boids[i].rule1_heading) +
+                  rule2_weight * sin(boids[i].rule2_heading) +
+                  rule3_weight * sin(boids[i].rule3_heading);
 
     boids[i].current_heading = atan2(new_y, new_x);
 
