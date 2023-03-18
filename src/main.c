@@ -1,12 +1,33 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
+#define NUM_BOIDS 256
+#define WIDTH 300
+#define HEIGHT 300
+
+struct boid {
+  float x;
+  float y;
+  float current_heading;
+} boids[NUM_BOIDS];
+
+void initialize_positions() {
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    boids[i].x = randFloat(0, WIDTH);
+    boids[i].y = randFloat(0, HEIGHT);
+    boids[i].current_heading = randFloat(0, 3.141 * 2);
+  }
+}
+
 int main() {
+
+  initialize_positions();
+
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
-  SDL_Window *window =
-      SDL_CreateWindow("Hello World", SDL_WINDOWPOS_UNDEFINED,
-                       SDL_WINDOWPOS_UNDEFINED, 400, 400, SDL_WINDOW_SHOWN);
+  SDL_Window *window = SDL_CreateWindow("Boids", SDL_WINDOWPOS_UNDEFINED,
+                                        SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,
+                                        SDL_WINDOW_SHOWN);
 
   SDL_Surface *surface = SDL_LoadBMP("test.bmp");
 
