@@ -9,6 +9,8 @@
 #define NUM_BOIDS 256
 #define WIDTH 300
 #define HEIGHT 300
+#define RADIUS_MAX 20
+#define RADIUS_MIN 5
 
 struct boid {
   float x;
@@ -36,6 +38,51 @@ void draw_boids(SDL_Renderer *renderer, bool debug_view) {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 
+    if (i == 0 && debug_view == true) {
+      for (float f = 0; f < 2 * M_PI; f += .1) {
+        float x1 = boids[i].x + RADIUS_MAX * cos(f);
+        float y1 = boids[i].y + RADIUS_MAX * sin(f);
+        float x2 = boids[i].x + RADIUS_MAX * cos(f + .1);
+        float y2 = boids[i].y + RADIUS_MAX * sin(f + .1);
+        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+      }
+      for (float f = 0; f < 2 * M_PI; f += .1) {
+        float x1 = boids[i].x + RADIUS_MIN * cos(f);
+        float y1 = boids[i].y + RADIUS_MIN * sin(f);
+        float x2 = boids[i].x + RADIUS_MIN * cos(f + .1);
+        float y2 = boids[i].y + RADIUS_MIN * sin(f + .1);
+        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+      }
+
+      {
+        float x1 = boids[i].x;
+        float y1 = boids[i].y;
+        float x2 = x1 + BOID_LENGTH * cos(boids[i].rule1_heading);
+        float y2 = y1 + BOID_LENGTH * sin(boids[i].rule1_heading);
+        SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff);
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+      }
+
+      {
+        float x1 = boids[i].x;
+        float y1 = boids[i].y;
+        float x2 = x1 + BOID_LENGTH * cos(boids[i].rule2_heading);
+        float y2 = y1 + BOID_LENGTH * sin(boids[i].rule2_heading);
+        SDL_SetRenderDrawColor(renderer, 0, 0xff, 0, 0xff);
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+      }
+
+      {
+        float x1 = boids[i].x;
+        float y1 = boids[i].y;
+        float x2 = x1 + BOID_LENGTH * cos(boids[i].rule3_heading);
+        float y2 = y1 + BOID_LENGTH * sin(boids[i].rule3_heading);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0xff, 0xff);
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+      }
+    }
   }
 }
 
@@ -63,6 +110,7 @@ void simulate_boids() {
 
 int main() {
   bool debug_view = true;
+  bool cap_framerate = true;
 
   srand(time(0));
 
@@ -104,6 +152,10 @@ int main() {
           running = false;
           break;
 
+        case SDLK_SPACE:
+          cap_framerate = !cap_framerate;
+          break;
+
         default:
           printf("Unhandled Key: %d\n", event.key.keysym.sym);
           break;
@@ -132,9 +184,11 @@ int main() {
     SDL_RenderPresent(renderer);
 
     Uint32 end = SDL_GetTicks();
-    int delay = 1000 / 30 - (end - begin);
-    if (delay > 0) {
-      SDL_Delay(delay);
+    if (cap_framerate) {
+      int delay = 1000 / 60 - (end - begin);
+      if (delay > 0) {
+        SDL_Delay(delay);
+      }
     }
   }
   SDL_DestroyTexture(texture);
