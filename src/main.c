@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
@@ -25,7 +26,7 @@ float randFloat(float low, float high) {
   return low + (high - low) * (float)rand() / (float)RAND_MAX;
 }
 
-void initialize_positions() {
+void initialize_positions(void) {
   for (int i = 0; i < NUM_BOIDS; i++) {
     boids[i].x = randFloat(0, WIDTH);
     boids[i].y = randFloat(0, HEIGHT);
@@ -169,7 +170,7 @@ void rule3(int idx) {
   }
 }
 
-void simulate_boids() {
+void simulate_boids(void) {
   for (int i = 0; i < NUM_BOIDS; i++) {
 
     if (boids[i].x > WIDTH) {
@@ -216,15 +217,17 @@ void simulate_boids() {
   }
 }
 
-int main() {
+int main(void) {
   bool debug_view = true;
   bool cap_framerate = true;
+  int frame = 0;
 
   srand(time(0));
 
   initialize_positions();
 
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+  TTF_Init();
 
   SDL_Window *window = SDL_CreateWindow("Boids", SDL_WINDOWPOS_UNDEFINED,
                                         SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,
@@ -239,6 +242,11 @@ int main() {
 
   SDL_FreeSurface(surface);
   surface = NULL;
+
+  TTF_Font *font = TTF_OpenFont(
+      "/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 24);
+
+  SDL_Color white = {255, 255, 255};
 
   SDL_Event event;
   bool running = true;
@@ -289,6 +297,15 @@ int main() {
 
     simulate_boids();
 
+    char frame_text[256];
+    snprintf(frame_text, 255, "%d", frame);
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, frame_text, white);
+    SDL_Texture *textTexture =
+        SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textSurface->clip_rect);
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+
     SDL_RenderPresent(renderer);
 
     Uint32 end = SDL_GetTicks();
@@ -298,6 +315,8 @@ int main() {
         SDL_Delay(delay);
       }
     }
+
+    frame++;
   }
   SDL_DestroyTexture(texture);
   SDL_DestroyRenderer(renderer);

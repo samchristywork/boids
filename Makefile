@@ -1,5 +1,5 @@
-CC := gcc
-LIBS := -lSDL2 -lm
+CC := clang
+LIBS := -lSDL2 -lm -lSDL2_ttf
 CFLAGS := -g -Wall -Werror -Wpedantic
 
 all: build/boids
