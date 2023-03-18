@@ -100,12 +100,22 @@ float boid_dist_2(int a, int b) {
   return dx * dx + dy * dy;
 }
 
-// TODO: less efficient
 float boid_dist(int a, int b) { return sqrt(boid_dist_2(a, b)); }
 
 // separation: steer to avoid crowding local flockmates
 void rule1(int idx) {
   boids[idx].rule1_heading = boids[idx].current_heading;
+
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    if (i != idx) {
+      float dist = boid_dist(idx, i);
+      if (dist < RADIUS_MIN) {
+        float dx = boids[idx].x - boids[i].x;
+        float dy = boids[idx].y - boids[i].y;
+        boids[idx].rule1_heading = atan2(dy, dx);
+      }
+    }
+  }
 }
 
 // alignment: steer towards the average heading of local flockmates
@@ -145,7 +155,7 @@ void simulate_boids() {
   for (int i = 0; i < NUM_BOIDS; i++) {
 
     float heading_weight = 1.0;
-    float rule1_weight = 0.0;
+    float rule1_weight = 0.004;
     float rule2_weight = 0.0;
     float rule3_weight = 0.0;
 
