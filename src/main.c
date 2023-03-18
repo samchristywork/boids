@@ -87,6 +87,21 @@ void draw_boids(SDL_Renderer *renderer, bool debug_view) {
 }
 
 void simulate_boids() {
+  for (int i = 0; i < NUM_BOIDS; i++) {
+
+    if (boids[i].x > WIDTH) {
+      boids[i].x = 0;
+    }
+    if (boids[i].x < 0) {
+      boids[i].x = WIDTH;
+    }
+    if (boids[i].y > HEIGHT) {
+      boids[i].y = 0;
+    }
+    if (boids[i].y < 0) {
+      boids[i].y = HEIGHT;
+    }
+  }
 
   for (int i = 0; i < NUM_BOIDS; i++) {
     // rule1(i);
