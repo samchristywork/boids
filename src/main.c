@@ -1,6 +1,11 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
+#define M_PI 3.14159265358979323846
+#define BOID_LENGTH 4
+#define BOID_SPEED .25
 #define NUM_BOIDS 256
 #define WIDTH 300
 #define HEIGHT 300
@@ -19,7 +24,47 @@ void initialize_positions() {
   }
 }
 
+void draw_boids(SDL_Renderer *renderer, bool debug_view) {
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    boids[i].x += BOID_SPEED * cos(boids[i].current_heading);
+    boids[i].y += BOID_SPEED * sin(boids[i].current_heading);
+
+    float x1 = boids[i].x;
+    float y1 = boids[i].y;
+    float x2 = x1 + BOID_LENGTH * cos(boids[i].current_heading);
+    float y2 = y1 + BOID_LENGTH * sin(boids[i].current_heading);
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+
+  }
+}
+
+void simulate_boids() {
+
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    // rule1(i);
+    // rule2(i);
+    // rule3(i);
+  }
+
+  for (int i = 0; i < NUM_BOIDS; i++) {
+
+    float heading_weight = 1.0;
+
+    float new_x = heading_weight * cos(boids[i].current_heading);
+    float new_y = heading_weight * sin(boids[i].current_heading);
+
+    boids[i].current_heading = atan2(new_y, new_x);
+
+    boids[i].x += BOID_SPEED * cos(boids[i].current_heading);
+    boids[i].y += BOID_SPEED * sin(boids[i].current_heading);
+  }
+}
+
 int main() {
+  bool debug_view = true;
+
+  srand(time(0));
 
   initialize_positions();
 
@@ -74,18 +119,15 @@ int main() {
       }
     }
 
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
 
-    SDL_Rect rectToDraw = {100, 100, 100, 100};
 
-    SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0);
-    SDL_RenderFillRect(renderer, &rectToDraw);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0xff, 0, 0);
-    SDL_RenderDrawRect(renderer, &rectToDraw);
 
-    SDL_RenderDrawLine(renderer, 0, 0, 100, 100);
+    draw_boids(renderer, debug_view);
+
+    simulate_boids();
 
     SDL_RenderPresent(renderer);
 
