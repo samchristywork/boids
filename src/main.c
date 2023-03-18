@@ -121,6 +121,25 @@ void rule1(int idx) {
 // alignment: steer towards the average heading of local flockmates
 void rule2(int idx) {
   boids[idx].rule2_heading = boids[idx].current_heading;
+
+  float sum_x_heading = 0;
+  float sum_y_heading = 0;
+  int n = 0;
+
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    if (i != idx) {
+      float dist = boid_dist(idx, i);
+      if (dist < RADIUS_MAX) {
+        sum_x_heading += cos(boids[i].current_heading);
+        sum_y_heading += sin(boids[i].current_heading);
+        n++;
+      }
+    }
+  }
+
+  if (n != 0) {
+    boids[idx].rule2_heading = atan2(sum_y_heading, sum_x_heading);
+  }
 }
 
 // cohesion: steer to move towards the average position (center of mass) of
@@ -156,7 +175,7 @@ void simulate_boids() {
 
     float heading_weight = 1.0;
     float rule1_weight = 0.004;
-    float rule2_weight = 0.0;
+    float rule2_weight = 0.01;
     float rule3_weight = 0.0;
 
     float new_x = heading_weight * cos(boids[i].current_heading) +
