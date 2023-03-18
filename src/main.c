@@ -146,6 +146,27 @@ void rule2(int idx) {
 // local flockmates
 void rule3(int idx) {
   boids[idx].rule3_heading = boids[idx].current_heading;
+
+  float sum_x_mass = 0;
+  float sum_y_mass = 0;
+  int n = 0;
+
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    if (i != idx) {
+      float dist = boid_dist(idx, i);
+      if (dist < RADIUS_MAX) {
+        sum_x_mass += boids[i].x;
+        sum_y_mass += boids[i].y;
+        n++;
+      }
+    }
+  }
+
+  if (n != 0) {
+    float dx = sum_x_mass / (float)n - boids[idx].x;
+    float dy = sum_y_mass / (float)n - boids[idx].y;
+    boids[idx].rule3_heading = atan2(dy, dx);
+  }
 }
 
 void simulate_boids() {
@@ -176,7 +197,7 @@ void simulate_boids() {
     float heading_weight = 1.0;
     float rule1_weight = 0.004;
     float rule2_weight = 0.01;
-    float rule3_weight = 0.0;
+    float rule3_weight = 0.0025;
 
     float new_x = heading_weight * cos(boids[i].current_heading) +
                   rule1_weight * cos(boids[i].rule1_heading) +
