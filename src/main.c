@@ -28,6 +28,7 @@ struct boid {
   float rule1_heading;
   float rule2_heading;
   float rule3_heading;
+  float rule4_heading;
 } boids[NUM_BOIDS];
 
 float randFloat(float low, float high) {
@@ -228,6 +229,13 @@ void rule3(int idx) {
   }
 }
 
+// noise: steer in random directions
+void rule4(int idx) {
+  boids[idx].rule4_heading = boids[idx].current_heading;
+
+  boids[idx].rule4_heading += randFloat(-0.1, 0.1);
+}
+
 void simulate_boids(void) {
 
   for (int i = 0; i < NUM_BOIDS; i++) {
@@ -255,24 +263,28 @@ void simulate_boids(void) {
     rule1(i);
     rule2(i);
     rule3(i);
+    rule4(i);
   }
 
   for (int i = 0; i < NUM_BOIDS; i++) {
 
     float heading_weight = 1.0;
-    float rule1_weight = 0.004;
+    float rule1_weight = 0.04;
     float rule2_weight = 0.01;
     float rule3_weight = 0.0025;
+    float rule4_weight = 0.0;
 
     float new_x = heading_weight * cos(boids[i].current_heading) +
                   rule1_weight * cos(boids[i].rule1_heading) +
                   rule2_weight * cos(boids[i].rule2_heading) +
-                  rule3_weight * cos(boids[i].rule3_heading);
+                  rule3_weight * cos(boids[i].rule3_heading) +
+                  rule4_weight * cos(boids[i].rule4_heading);
 
     float new_y = heading_weight * sin(boids[i].current_heading) +
                   rule1_weight * sin(boids[i].rule1_heading) +
                   rule2_weight * sin(boids[i].rule2_heading) +
-                  rule3_weight * sin(boids[i].rule3_heading);
+                  rule3_weight * sin(boids[i].rule3_heading) +
+                  rule4_weight * sin(boids[i].rule4_heading);
 
     boids[i].current_heading = atan2(new_y, new_x);
 
@@ -302,10 +314,7 @@ int main(void) {
   SDL_Renderer *renderer =
       SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-
-
-  TTF_Font *font = TTF_OpenFont(
-      "/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 12);
+  TTF_Font *font = TTF_OpenFont("res/LiberationSans-Regular.ttf", 12);
 
   SDL_Color white = {255, 255, 255};
 
@@ -359,10 +368,6 @@ int main(void) {
     int shade = 0x07;
     SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
     SDL_RenderClear(renderer);
-
-
-
-
 
     struct quadtree q = {0};
     q.w = WIDTH;
