@@ -73,16 +73,35 @@ void draw_quadtree(SDL_Renderer *renderer, struct quadtree *q, int shade,
   }
 }
 
-    float x1 = boids[i].x;
-    float y1 = boids[i].y;
-    float x2 = x1 + BOID_LENGTH * cos(boids[i].current_heading);
-    float y2 = y1 + BOID_LENGTH * sin(boids[i].current_heading);
+void draw_boid(SDL_Renderer *renderer, int id) {
+  float cx = boids[id].x;
+  float cy = boids[id].y;
+
+  float current_heading = boids[id].current_heading;
+
+  float x1 = cx + BOID_LENGTH * cos(current_heading);
+  float y1 = cy + BOID_LENGTH * sin(current_heading);
+
+  float x2 = cx + BOID_LENGTH * cos(current_heading + M_PI / 2) * 0.25;
+  float y2 = cy + BOID_LENGTH * sin(current_heading + M_PI / 2) * 0.25;
+
+  float x3 = cx + BOID_LENGTH * cos(current_heading - M_PI / 2) * 0.25;
+  float y3 = cy + BOID_LENGTH * sin(current_heading - M_PI / 2) * 0.25;
+
+  filledTrigonRGBA(renderer, x1, y1, x2, y2, x3, y3, BOID_SHADE, BOID_SHADE,
+                   BOID_SHADE, 0xff);
+}
+
+void draw_boids(SDL_Renderer *renderer, bool debug_view, struct quadtree *q) {
+  if (debug_view) {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     draw_quadtree(renderer, q, QUADTREE_STARTING_SHADE,
                   QUADTREE_SHADE_INCREMENT);
   }
 
   for (int i = 0; i < NUM_BOIDS; i++) {
+    draw_boid(renderer, i);
+
     if (i == 0 && debug_view == true) {
       for (float f = 0; f < 2 * M_PI; f += .1) {
         float x1 = boids[i].x + RADIUS_MAX * cos(f);
@@ -208,6 +227,12 @@ void rule3(int idx) {
 }
 
 void simulate_boids(void) {
+
+  for (int i = 0; i < NUM_BOIDS; i++) {
+    boids[i].x += BOID_SPEED * cos(boids[i].current_heading);
+    boids[i].y += BOID_SPEED * sin(boids[i].current_heading);
+  }
+
   for (int i = 0; i < NUM_BOIDS; i++) {
 
     if (boids[i].x > WIDTH) {
@@ -333,7 +358,16 @@ int main(void) {
     SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
 
 
-    draw_boids(renderer, debug_view);
+
+    struct quadtree q = {0};
+    q.w = WIDTH;
+    q.h = HEIGHT;
+
+    for (int i = 0; i < NUM_BOIDS; i++) {
+      quadtree_insert(&q, i, boids[i].x, boids[i].y);
+    }
+
+    draw_boids(renderer, debug_view, &q);
 
     simulate_boids();
 
