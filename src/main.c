@@ -1,8 +1,11 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
+
+#include "quadtree.h"
 
 #define M_PI 3.14159265358979323846
 #define BOID_LENGTH 4
