@@ -384,7 +384,21 @@ int main(void) {
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, frame_text, white);
     SDL_Texture *textTexture =
         SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_RenderCopy(renderer, textTexture, NULL, &textSurface->clip_rect);
+    SDL_Rect rect = textSurface->clip_rect;
+    rect.x = 0;
+    rect.y = 0;
+    SDL_RenderCopy(renderer, textTexture, NULL, &rect);
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(textTexture);
+
+    char framerate_text[256];
+    snprintf(framerate_text, 255, "%d", (int)fps);
+    textSurface = TTF_RenderText_Solid(font, framerate_text, white);
+    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    rect = textSurface->clip_rect;
+    rect.x = 0;
+    rect.y = 16;
+    SDL_RenderCopy(renderer, textTexture, NULL, &rect);
     SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(textTexture);
 
