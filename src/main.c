@@ -10,11 +10,14 @@
 #define M_PI 3.14159265358979323846
 #define BOID_LENGTH 4
 #define BOID_SPEED .25
-#define NUM_BOIDS 256
-#define WIDTH 300
-#define HEIGHT 300
+#define NUM_BOIDS 1024
+#define WIDTH 700
+#define HEIGHT 700
 #define RADIUS_MAX 20
 #define RADIUS_MIN 5
+#define BOID_SHADE 0x9f
+#define QUADTREE_STARTING_SHADE 0x40
+#define QUADTREE_SHADE_INCREMENT 0x4
 
 struct boid {
   float x;
@@ -37,18 +40,49 @@ void initialize_positions(void) {
   }
 }
 
-void draw_boids(SDL_Renderer *renderer, bool debug_view) {
-  for (int i = 0; i < NUM_BOIDS; i++) {
-    boids[i].x += BOID_SPEED * cos(boids[i].current_heading);
-    boids[i].y += BOID_SPEED * sin(boids[i].current_heading);
+void draw_quadtree(SDL_Renderer *renderer, struct quadtree *q, int shade,
+                   int shade_increment) {
+
+  SDL_Rect rect;
+  rect.x = q->x;
+  rect.y = q->y;
+  rect.w = q->w;
+  rect.h = q->h;
+
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &rect);
+  shade -= shade_increment;
+  if (shade < 0) {
+    shade = 0;
+  }
+
+  if (q->nw) {
+    draw_quadtree(renderer, q->nw, shade, shade_increment);
+  }
+
+  if (q->ne) {
+    draw_quadtree(renderer, q->ne, shade, shade_increment);
+  }
+
+  if (q->sw) {
+    draw_quadtree(renderer, q->sw, shade, shade_increment);
+  }
+
+  if (q->se) {
+    draw_quadtree(renderer, q->se, shade, shade_increment);
+  }
+}
 
     float x1 = boids[i].x;
     float y1 = boids[i].y;
     float x2 = x1 + BOID_LENGTH * cos(boids[i].current_heading);
     float y2 = y1 + BOID_LENGTH * sin(boids[i].current_heading);
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+    draw_quadtree(renderer, q, QUADTREE_STARTING_SHADE,
+                  QUADTREE_SHADE_INCREMENT);
+  }
 
+  for (int i = 0; i < NUM_BOIDS; i++) {
     if (i == 0 && debug_view == true) {
       for (float f = 0; f < 2 * M_PI; f += .1) {
         float x1 = boids[i].x + RADIUS_MAX * cos(f);
@@ -290,10 +324,13 @@ int main(void) {
       }
     }
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    int shade = 0x07;
+    SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
     SDL_RenderClear(renderer);
 
 
+    shade = 0xff;
+    SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
 
 
     draw_boids(renderer, debug_view);
