@@ -19,6 +19,8 @@
 #define QUADTREE_STARTING_SHADE 0x40
 #define QUADTREE_SHADE_INCREMENT 0x4
 
+float fps = 0;
+
 struct boid {
   float x;
   float y;
@@ -280,8 +282,10 @@ void simulate_boids(void) {
 }
 
 int main(void) {
+  bool cap_framerate = false;
   bool debug_view = true;
-  bool cap_framerate = true;
+  bool paused = false;
+
   int frame = 0;
 
   srand(time(0));
@@ -295,18 +299,13 @@ int main(void) {
                                         SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,
                                         SDL_WINDOW_SHOWN);
 
-  SDL_Surface *surface = SDL_LoadBMP("test.bmp");
-
   SDL_Renderer *renderer =
       SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-  SDL_FreeSurface(surface);
-  surface = NULL;
 
   TTF_Font *font = TTF_OpenFont(
-      "/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 24);
+      "/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 12);
 
   SDL_Color white = {255, 255, 255};
 
@@ -330,8 +329,16 @@ int main(void) {
           running = false;
           break;
 
-        case SDLK_SPACE:
+        case SDLK_c:
           cap_framerate = !cap_framerate;
+          break;
+
+        case SDLK_d:
+          debug_view = !debug_view;
+          break;
+
+        case SDLK_SPACE:
+          paused = !paused;
           break;
 
         default:
@@ -354,8 +361,6 @@ int main(void) {
     SDL_RenderClear(renderer);
 
 
-    shade = 0xff;
-    SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
 
 
 
@@ -369,7 +374,10 @@ int main(void) {
 
     draw_boids(renderer, debug_view, &q);
 
-    simulate_boids();
+    if (!paused) {
+      simulate_boids();
+      frame++;
+    }
 
     char frame_text[256];
     snprintf(frame_text, 255, "%d", frame);
@@ -390,9 +398,11 @@ int main(void) {
       }
     }
 
-    frame++;
+    if (frame % 10 == 0) {
+      fps = 1000.0 / (SDL_GetTicks() - begin);
+    }
   }
-  SDL_DestroyTexture(texture);
+
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
   SDL_Quit();
