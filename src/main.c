@@ -288,17 +288,25 @@ void simulate_boids(void) {
 
 int main(int argc, char *argv[]) {
   int frame = 0;
+  int target_fps = 60;
 
-  add_arg('c', "cap-framerate", "Start with a capped framerate.");
+  add_arg('c', "no-cap-framerate", "Start with a uncapped framerate.");
   add_arg('d', "debug", "Start with debug view enabled.");
+  add_arg('f', "fps", "Target FPS (default 60).");
   add_arg('n', "num", "Number of boids in simulation.");
   add_arg('p', "pause", "Start paused.");
   add_arg('s', "seed", "Seed to use for random generation.");
+
   parse_opts(argc, argv);
 
-  bool cap_framerate=get_is_set('c');
-  bool debug_view=get_is_set('d');
-  bool paused=get_is_set('p');
+  bool cap_framerate = !get_is_set('c');
+  bool debug_view = get_is_set('d');
+  bool paused = get_is_set('p');
+
+  if (get_value('f')) {
+    target_fps = atoi(get_value('f'));
+    cap_framerate = true;
+  }
 
   srand(time(0));
 
@@ -411,7 +419,7 @@ int main(int argc, char *argv[]) {
 
     Uint32 end = SDL_GetTicks();
     if (cap_framerate) {
-      int delay = 1000 / 60 - (end - begin);
+      int delay = 1000 / target_fps - (end - begin);
       if (delay > 0) {
         SDL_Delay(delay);
       }
