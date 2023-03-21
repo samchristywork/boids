@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "quadtree.h"
+#include <quadtree.h>
 
 void quadtree_insert(struct Quadtree *q, int id, float x, float y) {
 

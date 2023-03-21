@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "quadtree.h"
+#include <main.h>
+#include <quadtree.h>
 
 #define M_PI 3.14159265358979323846
 #define BOID_LENGTH 4

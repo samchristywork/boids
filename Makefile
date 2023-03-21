@@ -1,6 +1,6 @@
 CC := gcc
 LIBS := -lSDL2 -lm -lSDL2_gfx -lSDL2_ttf
-CFLAGS :=
+CFLAGS := -I src/
 
 .PHONY: all
 all: build/main
