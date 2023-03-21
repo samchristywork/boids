@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <command_line.h>
 #include <main.h>
 #include <quadtree.h>
 
-#define M_PI 3.14159265358979323846
 #define BOID_LENGTH 4
 #define BOID_SPEED .25
 #define NUM_BOIDS 1024
-#define WIDTH 700
+#define WIDTH 1200
 #define HEIGHT 700
 #define RADIUS_MAX 20
 #define RADIUS_MIN 5
@@ -286,12 +286,19 @@ void simulate_boids(void) {
   }
 }
 
-int main(void) {
-  bool cap_framerate = false;
-  bool debug_view = true;
-  bool paused = false;
-
+int main(int argc, char *argv[]) {
   int frame = 0;
+
+  add_arg('c', "cap-framerate", "Start with a capped framerate.");
+  add_arg('d', "debug", "Start with debug view enabled.");
+  add_arg('n', "num", "Number of boids in simulation.");
+  add_arg('p', "pause", "Start paused.");
+  add_arg('s', "seed", "Seed to use for random generation.");
+  parse_opts(argc, argv);
+
+  bool cap_framerate=get_is_set('c');
+  bool debug_view=get_is_set('d');
+  bool paused=get_is_set('p');
 
   srand(time(0));
 
