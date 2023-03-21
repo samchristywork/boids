@@ -19,9 +19,9 @@
 #define QUADTREE_STARTING_SHADE 0x40
 #define QUADTREE_SHADE_INCREMENT 0x4
 
-float fps = 0;
+float g_fps = 0;
 
-struct boid {
+struct Boid {
   float x;
   float y;
   float current_heading;
@@ -29,21 +29,23 @@ struct boid {
   float rule2_heading;
   float rule3_heading;
   float rule4_heading;
-} boids[NUM_BOIDS];
+};
 
-float randFloat(float low, float high) {
+struct Boid g_boids[NUM_BOIDS];
+
+float random_float(float low, float high) {
   return low + (high - low) * (float)rand() / (float)RAND_MAX;
 }
 
 void initialize_positions(void) {
   for (int i = 0; i < NUM_BOIDS; i++) {
-    boids[i].x = randFloat(0, WIDTH);
-    boids[i].y = randFloat(0, HEIGHT);
-    boids[i].current_heading = randFloat(0, 3.141 * 2);
+    g_boids[i].x = random_float(0, WIDTH);
+    g_boids[i].y = random_float(0, HEIGHT);
+    g_boids[i].current_heading = random_float(0, 3.141 * 2);
   }
 }
 
-void draw_quadtree(SDL_Renderer *renderer, struct quadtree *q, int shade,
+void draw_quadtree(SDL_Renderer *renderer, struct Quadtree *q, int shade,
                    int shade_increment) {
 
   SDL_Rect rect;
@@ -77,10 +79,10 @@ void draw_quadtree(SDL_Renderer *renderer, struct quadtree *q, int shade,
 }
 
 void draw_boid(SDL_Renderer *renderer, int id) {
-  float cx = boids[id].x;
-  float cy = boids[id].y;
+  float cx = g_boids[id].x;
+  float cy = g_boids[id].y;
 
-  float current_heading = boids[id].current_heading;
+  float current_heading = g_boids[id].current_heading;
 
   float x1 = cx + BOID_LENGTH * cos(current_heading);
   float y1 = cy + BOID_LENGTH * sin(current_heading);
@@ -95,7 +97,7 @@ void draw_boid(SDL_Renderer *renderer, int id) {
                    BOID_SHADE, 0xff);
 }
 
-void draw_boids(SDL_Renderer *renderer, bool debug_view, struct quadtree *q) {
+void draw_boids(SDL_Renderer *renderer, bool debug_view, struct Quadtree *q) {
   if (debug_view) {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     draw_quadtree(renderer, q, QUADTREE_STARTING_SHADE,
@@ -106,36 +108,36 @@ void draw_boids(SDL_Renderer *renderer, bool debug_view, struct quadtree *q) {
     draw_boid(renderer, i);
 
     if (i == 0 && debug_view == true) {
-      aacircleRGBA(renderer, boids[i].x, boids[i].y, RADIUS_MAX, 0xff, 0xff,
+      aacircleRGBA(renderer, g_boids[i].x, g_boids[i].y, RADIUS_MAX, 0xff, 0xff,
                    0xff, 0xff);
 
-      aacircleRGBA(renderer, boids[i].x, boids[i].y, RADIUS_MIN, 0xff, 0xff,
+      aacircleRGBA(renderer, g_boids[i].x, g_boids[i].y, RADIUS_MIN, 0xff, 0xff,
                    0xff, 0xff);
 
       int ind_len = 10;
       {
-        float x1 = boids[i].x;
-        float y1 = boids[i].y;
-        float x2 = x1 + ind_len * cos(boids[i].rule1_heading);
-        float y2 = y1 + ind_len * sin(boids[i].rule1_heading);
+        float x1 = g_boids[i].x;
+        float y1 = g_boids[i].y;
+        float x2 = x1 + ind_len * cos(g_boids[i].rule1_heading);
+        float y2 = y1 + ind_len * sin(g_boids[i].rule1_heading);
         SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
 
       {
-        float x1 = boids[i].x;
-        float y1 = boids[i].y;
-        float x2 = x1 + ind_len * cos(boids[i].rule2_heading);
-        float y2 = y1 + ind_len * sin(boids[i].rule2_heading);
+        float x1 = g_boids[i].x;
+        float y1 = g_boids[i].y;
+        float x2 = x1 + ind_len * cos(g_boids[i].rule2_heading);
+        float y2 = y1 + ind_len * sin(g_boids[i].rule2_heading);
         SDL_SetRenderDrawColor(renderer, 0, 0xff, 0, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
 
       {
-        float x1 = boids[i].x;
-        float y1 = boids[i].y;
-        float x2 = x1 + ind_len * cos(boids[i].rule3_heading);
-        float y2 = y1 + ind_len * sin(boids[i].rule3_heading);
+        float x1 = g_boids[i].x;
+        float y1 = g_boids[i].y;
+        float x2 = x1 + ind_len * cos(g_boids[i].rule3_heading);
+        float y2 = y1 + ind_len * sin(g_boids[i].rule3_heading);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0xff, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
@@ -144,8 +146,8 @@ void draw_boids(SDL_Renderer *renderer, bool debug_view, struct quadtree *q) {
 }
 
 float boid_dist_2(int a, int b) {
-  float dx = boids[a].x - boids[b].x;
-  float dy = boids[a].y - boids[b].y;
+  float dx = g_boids[a].x - g_boids[b].x;
+  float dy = g_boids[a].y - g_boids[b].y;
 
   return dx * dx + dy * dy;
 }
@@ -154,15 +156,15 @@ float boid_dist(int a, int b) { return sqrt(boid_dist_2(a, b)); }
 
 // separation: steer to avoid crowding local flockmates
 void rule1(int idx) {
-  boids[idx].rule1_heading = boids[idx].current_heading;
+  g_boids[idx].rule1_heading = g_boids[idx].current_heading;
 
   for (int i = 0; i < NUM_BOIDS; i++) {
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MIN) {
-        float dx = boids[idx].x - boids[i].x;
-        float dy = boids[idx].y - boids[i].y;
-        boids[idx].rule1_heading = atan2(dy, dx);
+        float dx = g_boids[idx].x - g_boids[i].x;
+        float dy = g_boids[idx].y - g_boids[i].y;
+        g_boids[idx].rule1_heading = atan2(dy, dx);
       }
     }
   }
@@ -170,7 +172,7 @@ void rule1(int idx) {
 
 // alignment: steer towards the average heading of local flockmates
 void rule2(int idx) {
-  boids[idx].rule2_heading = boids[idx].current_heading;
+  g_boids[idx].rule2_heading = g_boids[idx].current_heading;
 
   float sum_x_heading = 0;
   float sum_y_heading = 0;
@@ -180,22 +182,22 @@ void rule2(int idx) {
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
-        sum_x_heading += cos(boids[i].current_heading);
-        sum_y_heading += sin(boids[i].current_heading);
+        sum_x_heading += cos(g_boids[i].current_heading);
+        sum_y_heading += sin(g_boids[i].current_heading);
         n++;
       }
     }
   }
 
   if (n != 0) {
-    boids[idx].rule2_heading = atan2(sum_y_heading, sum_x_heading);
+    g_boids[idx].rule2_heading = atan2(sum_y_heading, sum_x_heading);
   }
 }
 
 // cohesion: steer to move towards the average position (center of mass) of
 // local flockmates
 void rule3(int idx) {
-  boids[idx].rule3_heading = boids[idx].current_heading;
+  g_boids[idx].rule3_heading = g_boids[idx].current_heading;
 
   float sum_x_mass = 0;
   float sum_y_mass = 0;
@@ -205,47 +207,47 @@ void rule3(int idx) {
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
-        sum_x_mass += boids[i].x;
-        sum_y_mass += boids[i].y;
+        sum_x_mass += g_boids[i].x;
+        sum_y_mass += g_boids[i].y;
         n++;
       }
     }
   }
 
   if (n != 0) {
-    float dx = sum_x_mass / (float)n - boids[idx].x;
-    float dy = sum_y_mass / (float)n - boids[idx].y;
-    boids[idx].rule3_heading = atan2(dy, dx);
+    float dx = sum_x_mass / (float)n - g_boids[idx].x;
+    float dy = sum_y_mass / (float)n - g_boids[idx].y;
+    g_boids[idx].rule3_heading = atan2(dy, dx);
   }
 }
 
 // noise: steer in random directions
 void rule4(int idx) {
-  boids[idx].rule4_heading = boids[idx].current_heading;
+  g_boids[idx].rule4_heading = g_boids[idx].current_heading;
 
-  boids[idx].rule4_heading += randFloat(-0.1, 0.1);
+  g_boids[idx].rule4_heading += random_float(-0.1, 0.1);
 }
 
 void simulate_boids(void) {
 
   for (int i = 0; i < NUM_BOIDS; i++) {
-    boids[i].x += BOID_SPEED * cos(boids[i].current_heading);
-    boids[i].y += BOID_SPEED * sin(boids[i].current_heading);
+    g_boids[i].x += BOID_SPEED * cos(g_boids[i].current_heading);
+    g_boids[i].y += BOID_SPEED * sin(g_boids[i].current_heading);
   }
 
   for (int i = 0; i < NUM_BOIDS; i++) {
 
-    if (boids[i].x > WIDTH) {
-      boids[i].x = 0;
+    if (g_boids[i].x > WIDTH) {
+      g_boids[i].x = 0;
     }
-    if (boids[i].x < 0) {
-      boids[i].x = WIDTH;
+    if (g_boids[i].x < 0) {
+      g_boids[i].x = WIDTH;
     }
-    if (boids[i].y > HEIGHT) {
-      boids[i].y = 0;
+    if (g_boids[i].y > HEIGHT) {
+      g_boids[i].y = 0;
     }
-    if (boids[i].y < 0) {
-      boids[i].y = HEIGHT;
+    if (g_boids[i].y < 0) {
+      g_boids[i].y = HEIGHT;
     }
   }
 
@@ -264,22 +266,22 @@ void simulate_boids(void) {
     float rule3_weight = 0.0025;
     float rule4_weight = 0.0;
 
-    float new_x = heading_weight * cos(boids[i].current_heading) +
-                  rule1_weight * cos(boids[i].rule1_heading) +
-                  rule2_weight * cos(boids[i].rule2_heading) +
-                  rule3_weight * cos(boids[i].rule3_heading) +
-                  rule4_weight * cos(boids[i].rule4_heading);
+    float new_x = heading_weight * cos(g_boids[i].current_heading) +
+                  rule1_weight * cos(g_boids[i].rule1_heading) +
+                  rule2_weight * cos(g_boids[i].rule2_heading) +
+                  rule3_weight * cos(g_boids[i].rule3_heading) +
+                  rule4_weight * cos(g_boids[i].rule4_heading);
 
-    float new_y = heading_weight * sin(boids[i].current_heading) +
-                  rule1_weight * sin(boids[i].rule1_heading) +
-                  rule2_weight * sin(boids[i].rule2_heading) +
-                  rule3_weight * sin(boids[i].rule3_heading) +
-                  rule4_weight * sin(boids[i].rule4_heading);
+    float new_y = heading_weight * sin(g_boids[i].current_heading) +
+                  rule1_weight * sin(g_boids[i].rule1_heading) +
+                  rule2_weight * sin(g_boids[i].rule2_heading) +
+                  rule3_weight * sin(g_boids[i].rule3_heading) +
+                  rule4_weight * sin(g_boids[i].rule4_heading);
 
-    boids[i].current_heading = atan2(new_y, new_x);
+    g_boids[i].current_heading = atan2(new_y, new_x);
 
-    boids[i].x += BOID_SPEED * cos(boids[i].current_heading);
-    boids[i].y += BOID_SPEED * sin(boids[i].current_heading);
+    g_boids[i].x += BOID_SPEED * cos(g_boids[i].current_heading);
+    g_boids[i].y += BOID_SPEED * sin(g_boids[i].current_heading);
   }
 }
 
@@ -359,12 +361,12 @@ int main(void) {
     SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
     SDL_RenderClear(renderer);
 
-    struct quadtree q = {0};
+    struct Quadtree q = {0};
     q.w = WIDTH;
     q.h = HEIGHT;
 
     for (int i = 0; i < NUM_BOIDS; i++) {
-      quadtree_insert(&q, i, boids[i].x, boids[i].y);
+      quadtree_insert(&q, i, g_boids[i].x, g_boids[i].y);
     }
 
     draw_boids(renderer, debug_view, &q);
@@ -387,7 +389,7 @@ int main(void) {
     SDL_DestroyTexture(textTexture);
 
     char framerate_text[256];
-    snprintf(framerate_text, 255, "%d", (int)fps);
+    snprintf(framerate_text, 255, "%d", (int)g_fps);
     textSurface = TTF_RenderText_Solid(font, framerate_text, white);
     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
     rect = textSurface->clip_rect;
@@ -408,7 +410,7 @@ int main(void) {
     }
 
     if (frame % 10 == 0) {
-      fps = 1000.0 / (SDL_GetTicks() - begin);
+      g_fps = 1000.0 / (SDL_GetTicks() - begin);
     }
   }
 

@@ -3,28 +3,28 @@
 
 #define QUADTREE_MAX_CHILDREN 1
 
-struct quadtree_point {
+struct QuadtreePoint {
   float x;
   float y;
   int id;
 };
 
-struct quadtree {
+struct Quadtree {
   float x;
   float y;
   float w;
   float h;
 
-  struct quadtree *nw;
-  struct quadtree *ne;
-  struct quadtree *sw;
-  struct quadtree *se;
+  struct Quadtree *nw;
+  struct Quadtree *ne;
+  struct Quadtree *sw;
+  struct Quadtree *se;
 
-  struct quadtree_point data[QUADTREE_MAX_CHILDREN];
-  int num_children;
+  struct QuadtreePoint data[QUADTREE_MAX_CHILDREN];
+  int numChildren;
 };
 
-void quadtree_insert(struct quadtree *q, int id, float x, float y);
+void quadtree_insert(struct Quadtree *q, int id, float x, float y);
 
 int *quadtree_query(float x, float y, float w, float h);
 

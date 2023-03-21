@@ -4,7 +4,7 @@
 
 #include "quadtree.h"
 
-void quadtree_insert(struct quadtree *q, int id, float x, float y) {
+void quadtree_insert(struct Quadtree *q, int id, float x, float y) {
 
   if (q->nw != NULL) {
     // West
@@ -31,22 +31,22 @@ void quadtree_insert(struct quadtree *q, int id, float x, float y) {
     }
   } else {
 
-    if (q->num_children < QUADTREE_MAX_CHILDREN) {
-      q->data[q->num_children].id = id;
-      q->data[q->num_children].x = x;
-      q->data[q->num_children].y = y;
-      q->num_children++;
+    if (q->numChildren < QUADTREE_MAX_CHILDREN) {
+      q->data[q->numChildren].id = id;
+      q->data[q->numChildren].x = x;
+      q->data[q->numChildren].y = y;
+      q->numChildren++;
     } else {
 
-      q->nw = malloc(sizeof(struct quadtree));
-      q->ne = malloc(sizeof(struct quadtree));
-      q->sw = malloc(sizeof(struct quadtree));
-      q->se = malloc(sizeof(struct quadtree));
+      q->nw = malloc(sizeof(struct Quadtree));
+      q->ne = malloc(sizeof(struct Quadtree));
+      q->sw = malloc(sizeof(struct Quadtree));
+      q->se = malloc(sizeof(struct Quadtree));
 
-      memset(q->nw, 0, sizeof(struct quadtree));
-      memset(q->ne, 0, sizeof(struct quadtree));
-      memset(q->sw, 0, sizeof(struct quadtree));
-      memset(q->se, 0, sizeof(struct quadtree));
+      memset(q->nw, 0, sizeof(struct Quadtree));
+      memset(q->ne, 0, sizeof(struct Quadtree));
+      memset(q->sw, 0, sizeof(struct Quadtree));
+      memset(q->se, 0, sizeof(struct Quadtree));
 
       q->nw->x = q->x;
       q->nw->y = q->y;
