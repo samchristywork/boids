@@ -48,6 +48,19 @@ void add_boid() {
 
 void remove_boid() { g_num_boids--; }
 
+void draw_text(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
+               SDL_Color color, char *text) {
+  SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, color);
+  SDL_Texture *textTexture =
+      SDL_CreateTextureFromSurface(renderer, textSurface);
+  SDL_Rect rect = textSurface->clip_rect;
+  rect.x = x;
+  rect.y = y;
+  SDL_RenderCopy(renderer, textTexture, NULL, &rect);
+  SDL_FreeSurface(textSurface);
+  SDL_DestroyTexture(textTexture);
+}
+
 void initialize_positions(int n) {
   for (int i = 0; i < n; i++) {
     add_boid();
@@ -414,27 +427,16 @@ int main(int argc, char *argv[]) {
     }
 
     char frame_text[256];
-    snprintf(frame_text, 255, "%d", frame);
-    SDL_Surface *textSurface = TTF_RenderText_Solid(font, frame_text, white);
-    SDL_Texture *textTexture =
-        SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_Rect rect = textSurface->clip_rect;
-    rect.x = 0;
-    rect.y = 0;
-    SDL_RenderCopy(renderer, textTexture, NULL, &rect);
-    SDL_FreeSurface(textSurface);
-    SDL_DestroyTexture(textTexture);
+    snprintf(frame_text, 255, "Frame: %d", frame);
+    draw_text(renderer, font, 0, 0, white, frame_text);
 
     char framerate_text[256];
-    snprintf(framerate_text, 255, "%d", (int)g_fps);
-    textSurface = TTF_RenderText_Solid(font, framerate_text, white);
-    textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    rect = textSurface->clip_rect;
-    rect.x = 0;
-    rect.y = 16;
-    SDL_RenderCopy(renderer, textTexture, NULL, &rect);
-    SDL_FreeSurface(textSurface);
-    SDL_DestroyTexture(textTexture);
+    snprintf(framerate_text, 255, "FPS: %d", (int)g_fps);
+    draw_text(renderer, font, 0, 16, white, framerate_text);
+
+    char num_boids_text[256];
+    snprintf(num_boids_text, 255, "Boids: %d", (int)g_num_boids);
+    draw_text(renderer, font, 0, 32, white, num_boids_text);
 
     SDL_RenderPresent(renderer);
 
