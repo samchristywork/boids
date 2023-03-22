@@ -23,11 +23,16 @@ run:
 .PHONY: watch
 watch:
 	make clean
-	find src/ | entr -s 'make && ./build/main'
+	find src/ | entr -s 'pkill someuniquename; make && ln -sf ./main ./build/someuniquename && ./build/someuniquename &'
 
 .PHONY: flamegraph
 flamegraph:
 	perf record --call-graph dwarf build/main && flamegraph --perfdata perf.data
+
+.PHONY: performance
+performance:
+	make && ln -sf ./main ./build/someuniquename && build/someuniquename > /dev/null &
+	watch -e -n0 cat /proc/$$(pgrep someuniquename)/status
 
 .PHONY: covhtml
 covhtml:
