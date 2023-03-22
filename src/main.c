@@ -345,7 +345,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  srand(time(0));
+  if (get_value('s')) {
+    srand(atoi(get_value('s')));
+  } else {
+    srand(time(0));
+  }
 
   initialize_positions(num_boids);
 
