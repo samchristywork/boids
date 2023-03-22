@@ -317,12 +317,15 @@ int main(int argc, char *argv[]) {
   add_arg('n', "num", "Number of boids in simulation (default 256).");
   add_arg('p', "pause", "Start paused.");
   add_arg('s', "seed", "Seed to use for random generation.");
+  add_arg('y', "dynamic",
+          "Number of boids dynamically changes based on framerate.");
 
   parse_opts(argc, argv);
 
   bool cap_framerate = !get_is_set('c');
   bool debug_view = get_is_set('d');
   bool paused = get_is_set('p');
+  bool dynamic = get_is_set('y');
 
   if (get_value('f')) {
     target_fps = atoi(get_value('f'));
@@ -445,6 +448,15 @@ int main(int argc, char *argv[]) {
       int delay = 1000 / target_fps - (end - begin);
       if (delay > 0) {
         SDL_Delay(delay);
+        if (dynamic) {
+          add_boid();
+        }
+      } else {
+        if (dynamic) {
+          if (frame % 100 == 0) {
+            remove_boid();
+          }
+        }
       }
     }
 
