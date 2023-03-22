@@ -6,32 +6,32 @@
 #include <string.h>
 
 struct Argument {
-  char *long_name;
+  char *longName;
   char *description;
   char *value;
   int set;
   void (*function)();
 };
 
-struct Argument Arguments[26] = {{0}};
+struct Argument g_arguments[26] = {{0}};
 
 void set_arg_function(void (*function)(), char short_name) {
   int idx = short_name - 'a';
 
   if (idx >= 0 && idx < 26) {
-    Arguments[idx].function = function;
+    g_arguments[idx].function = function;
   }
 }
 
-void add_arg(char short_name, char *long_name, char *description) {
+void add_arg(char short_name, char *longName, char *description) {
   int idx = short_name - 'a';
 
   if (idx >= 0 && idx < 26) {
-    Arguments[idx].long_name = (char *)malloc(strlen(long_name) + 1);
-    Arguments[idx].description = (char *)malloc(strlen(description) + 1);
+    g_arguments[idx].longName = (char *)malloc(strlen(longName) + 1);
+    g_arguments[idx].description = (char *)malloc(strlen(description) + 1);
 
-    strcpy(Arguments[idx].long_name, long_name);
-    strcpy(Arguments[idx].description, description);
+    strcpy(g_arguments[idx].longName, longName);
+    strcpy(g_arguments[idx].description, description);
   }
 }
 
@@ -39,7 +39,7 @@ int get_is_set(char short_name) {
   int idx = short_name - 'a';
 
   if (idx >= 0 && idx < 26) {
-    return Arguments[idx].set;
+    return g_arguments[idx].set;
   }
 
   return 0;
@@ -49,7 +49,7 @@ char *get_value(char short_name) {
   int idx = short_name - 'a';
 
   if (idx >= 0 && idx < 26) {
-    return Arguments[idx].value;
+    return g_arguments[idx].value;
   }
 
   return NULL;
@@ -58,12 +58,12 @@ char *get_value(char short_name) {
 void usage() {
   printf("Usage:\n");
   for (int i = 0; i < 26; i++) {
-    if (Arguments[i].description) {
-      printf("  -%c,--%s ", 'a' + i, Arguments[i].long_name);
-      for (int j = strlen(Arguments[i].long_name); j < 17; j++) {
+    if (g_arguments[i].description) {
+      printf("  -%c,--%s ", 'a' + i, g_arguments[i].longName);
+      for (int j = strlen(g_arguments[i].longName); j < 17; j++) {
         printf(" ");
       }
-      printf("%s\n", Arguments[i].description);
+      printf("%s\n", g_arguments[i].description);
     }
   }
 
@@ -84,9 +84,9 @@ void parse_opts(int argc, char *argv[]) {
         if (argv[i][1] != '-') {
           for (int j = 1; j < strlen(argv[i]); j++) {
             last_arg = argv[i][j] - 'a';
-            Arguments[last_arg].set = 1;
-            if (Arguments[last_arg].function) {
-              Arguments[last_arg].function();
+            g_arguments[last_arg].set = 1;
+            if (g_arguments[last_arg].function) {
+              g_arguments[last_arg].function();
             }
           }
 
@@ -94,12 +94,12 @@ void parse_opts(int argc, char *argv[]) {
         } else {
           if (strlen(argv[i]) >= 3) {
             for (int j = 0; j < 26; j++) {
-              if (Arguments[j].long_name) {
-                if (strcmp(Arguments[j].long_name, argv[i] + 2) == 0) {
+              if (g_arguments[j].longName) {
+                if (strcmp(g_arguments[j].longName, argv[i] + 2) == 0) {
                   last_arg = j;
-                  Arguments[last_arg].set = 1;
-                  if (Arguments[last_arg].function) {
-                    Arguments[last_arg].function();
+                  g_arguments[last_arg].set = 1;
+                  if (g_arguments[last_arg].function) {
+                    g_arguments[last_arg].function();
                   }
                   break;
                 }
@@ -115,16 +115,16 @@ void parse_opts(int argc, char *argv[]) {
         // Value
       } else {
         if (last_arg != -1) {
-          Arguments[last_arg].value = (char *)malloc(strlen(argv[i]) + 1);
-          strcpy(Arguments[last_arg].value, argv[i]);
+          g_arguments[last_arg].value = (char *)malloc(strlen(argv[i]) + 1);
+          strcpy(g_arguments[last_arg].value, argv[i]);
         }
       }
 
       // Single character arg
     } else {
       if (last_arg != -1) {
-        Arguments[last_arg].value = (char *)malloc(strlen(argv[i]) + 1);
-        strcpy(Arguments[last_arg].value, argv[i]);
+        g_arguments[last_arg].value = (char *)malloc(strlen(argv[i]) + 1);
+        strcpy(g_arguments[last_arg].value, argv[i]);
       }
     }
   }
