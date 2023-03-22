@@ -21,7 +21,7 @@
 #define QUADTREE_SHADE_INCREMENT 0x4
 
 float g_fps = 0;
-int g_num_boids = 60;
+int g_num_boids = 0;
 
 struct Boid {
   float x;
@@ -39,11 +39,18 @@ float random_float(float low, float high) {
   return low + (high - low) * (float)rand() / (float)RAND_MAX;
 }
 
-void initialize_positions(void) {
-  for (int i = 0; i < g_num_boids; i++) {
-    g_boids[i].x = random_float(0, WIDTH);
-    g_boids[i].y = random_float(0, HEIGHT);
-    g_boids[i].current_heading = random_float(0, 3.141 * 2);
+void add_boid() {
+  g_boids[g_num_boids].x = random_float(0, WIDTH);
+  g_boids[g_num_boids].y = random_float(0, HEIGHT);
+  g_boids[g_num_boids].current_heading = random_float(0, 3.141 * 2);
+  g_num_boids++;
+}
+
+void remove_boid() { g_num_boids--; }
+
+void initialize_positions(int n) {
+  for (int i = 0; i < n; i++) {
+    add_boid();
   }
 }
 
@@ -294,7 +301,7 @@ int main(int argc, char *argv[]) {
   add_arg('c', "no-cap-framerate", "Start with a uncapped framerate.");
   add_arg('d', "debug", "Start with debug view enabled.");
   add_arg('f', "fps", "Target FPS (default 60).");
-  add_arg('n', "num", "Number of boids in simulation.");
+  add_arg('n', "num", "Number of boids in simulation (default 256).");
   add_arg('p', "pause", "Start paused.");
   add_arg('s', "seed", "Seed to use for random generation.");
 
@@ -309,21 +316,22 @@ int main(int argc, char *argv[]) {
     cap_framerate = true;
   }
 
+  int num_boids = 256;
   if (get_value('n')) {
-    g_num_boids = atoi(get_value('n'));
+    num_boids = atoi(get_value('n'));
 
-    if (g_num_boids < 0) {
-      g_num_boids = 0;
+    if (num_boids < 0) {
+      num_boids = 0;
     }
 
-    if (g_num_boids > MAX_BOIDS) {
-      g_num_boids = MAX_BOIDS;
+    if (num_boids > MAX_BOIDS) {
+      num_boids = MAX_BOIDS;
     }
   }
 
   srand(time(0));
 
-  initialize_positions();
+  initialize_positions(num_boids);
 
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   TTF_Init();
