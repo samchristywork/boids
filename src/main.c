@@ -11,7 +11,7 @@
 
 #define BOID_LENGTH 4
 #define BOID_SPEED .25
-#define NUM_BOIDS 1024
+#define MAX_BOIDS 1024
 #define WIDTH 1200
 #define HEIGHT 700
 #define RADIUS_MAX 20
@@ -21,6 +21,7 @@
 #define QUADTREE_SHADE_INCREMENT 0x4
 
 float g_fps = 0;
+int g_num_boids = 60;
 
 struct Boid {
   float x;
@@ -32,14 +33,14 @@ struct Boid {
   float rule4_heading;
 };
 
-struct Boid g_boids[NUM_BOIDS];
+struct Boid g_boids[MAX_BOIDS];
 
 float random_float(float low, float high) {
   return low + (high - low) * (float)rand() / (float)RAND_MAX;
 }
 
 void initialize_positions(void) {
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
     g_boids[i].x = random_float(0, WIDTH);
     g_boids[i].y = random_float(0, HEIGHT);
     g_boids[i].current_heading = random_float(0, 3.141 * 2);
@@ -105,7 +106,7 @@ void draw_boids(SDL_Renderer *renderer, bool debug_view, struct Quadtree *q) {
                   QUADTREE_SHADE_INCREMENT);
   }
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
     draw_boid(renderer, i);
 
     if (i == 0 && debug_view == true) {
@@ -159,7 +160,7 @@ float boid_dist(int a, int b) { return sqrt(boid_dist_2(a, b)); }
 void rule1(int idx) {
   g_boids[idx].rule1_heading = g_boids[idx].current_heading;
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MIN) {
@@ -179,7 +180,7 @@ void rule2(int idx) {
   float sum_y_heading = 0;
   int n = 0;
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
@@ -204,7 +205,7 @@ void rule3(int idx) {
   float sum_y_mass = 0;
   int n = 0;
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
@@ -231,12 +232,12 @@ void rule4(int idx) {
 
 void simulate_boids(void) {
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
     g_boids[i].x += BOID_SPEED * cos(g_boids[i].current_heading);
     g_boids[i].y += BOID_SPEED * sin(g_boids[i].current_heading);
   }
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
 
     if (g_boids[i].x > WIDTH) {
       g_boids[i].x = 0;
@@ -252,14 +253,14 @@ void simulate_boids(void) {
     }
   }
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
     rule1(i);
     rule2(i);
     rule3(i);
     rule4(i);
   }
 
-  for (int i = 0; i < NUM_BOIDS; i++) {
+  for (int i = 0; i < g_num_boids; i++) {
 
     float heading_weight = 1.0;
     float rule1_weight = 0.04;
@@ -306,6 +307,18 @@ int main(int argc, char *argv[]) {
   if (get_value('f')) {
     target_fps = atoi(get_value('f'));
     cap_framerate = true;
+  }
+
+  if (get_value('n')) {
+    g_num_boids = atoi(get_value('n'));
+
+    if (g_num_boids < 0) {
+      g_num_boids = 0;
+    }
+
+    if (g_num_boids > MAX_BOIDS) {
+      g_num_boids = MAX_BOIDS;
+    }
   }
 
   srand(time(0));
@@ -381,7 +394,7 @@ int main(int argc, char *argv[]) {
     q.w = WIDTH;
     q.h = HEIGHT;
 
-    for (int i = 0; i < NUM_BOIDS; i++) {
+    for (int i = 0; i < g_num_boids; i++) {
       quadtree_insert(&q, i, g_boids[i].x, g_boids[i].y);
     }
 
