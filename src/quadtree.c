@@ -75,3 +75,17 @@ void quadtree_insert(struct Quadtree *q, int id, float x, float y) {
     }
   }
 }
+
+void quadtree_free(struct Quadtree *q){
+  if(q->nw){
+    quadtree_free(q->nw);
+    quadtree_free(q->ne);
+    quadtree_free(q->sw);
+    quadtree_free(q->se);
+
+    free(q->nw);
+    free(q->ne);
+    free(q->sw);
+    free(q->se);
+  }
+}

@@ -428,6 +428,8 @@ int main(int argc, char *argv[]) {
 
     draw_boids(renderer, debug_view, &q);
 
+    quadtree_free(&q);
+
     if (!paused) {
       simulate_boids();
       frame++;

@@ -26,6 +26,8 @@ struct Quadtree {
 
 void quadtree_insert(struct Quadtree *q, int id, float x, float y);
 
+void quadtree_free(struct Quadtree *q);
+
 int *quadtree_query(float x, float y, float w, float h);
 
 #endif
