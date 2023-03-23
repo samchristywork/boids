@@ -34,6 +34,11 @@ performance:
 	make && ln -sf ./main ./build/someuniquename && build/someuniquename > /dev/null &
 	watch -e -n0 cat /proc/$$(pgrep someuniquename)/status
 
+.PHONY: list
+list:
+	@echo Valid Targets:
+	@make -qp | awk -F':' '/^[a-zA-Z0-9][^$$#\/\t=]*:([^=]|$$)/ {split($$1,A,/ /);for(i in A)print A[i]}' | sort -u | grep -v "^Makefile$$" | sed 's/^/  - /g'
+
 .PHONY: covhtml
 covhtml:
 	make clean || exit
