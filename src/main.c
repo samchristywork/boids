@@ -8,17 +8,7 @@
 #include <command_line.h>
 #include <main.h>
 #include <quadtree.h>
-
-#define BOID_LENGTH 4
-#define BOID_SPEED .25
-#define MAX_BOIDS 1024
-#define WIDTH 1200
-#define HEIGHT 700
-#define RADIUS_MAX 20
-#define RADIUS_MIN 5
-#define BOID_SHADE 0x9f
-#define QUADTREE_STARTING_SHADE 0x40
-#define QUADTREE_SHADE_INCREMENT 0x4
+#include <render.h>
 
 float g_fps = 0;
 int g_num_boids = 0;
@@ -37,122 +27,9 @@ void add_boid() {
 
 void remove_boid() { g_num_boids--; }
 
-void draw_text(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
-               SDL_Color color, char *text) {
-  SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, color);
-  SDL_Texture *textTexture =
-      SDL_CreateTextureFromSurface(renderer, textSurface);
-  SDL_Rect rect = textSurface->clip_rect;
-  rect.x = x;
-  rect.y = y;
-  SDL_RenderCopy(renderer, textTexture, NULL, &rect);
-  SDL_FreeSurface(textSurface);
-  SDL_DestroyTexture(textTexture);
-}
-
 void initialize_positions(int n) {
   for (int i = 0; i < n; i++) {
     add_boid();
-  }
-}
-
-void draw_quadtree(SDL_Renderer *renderer, struct Quadtree *q, int shade,
-                   int shade_increment) {
-
-  SDL_Rect rect;
-  rect.x = q->x;
-  rect.y = q->y;
-  rect.w = q->w;
-  rect.h = q->h;
-
-  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
-  SDL_RenderFillRect(renderer, &rect);
-  shade -= shade_increment;
-  if (shade < 0) {
-    shade = 0;
-  }
-
-  if (q->nw) {
-    draw_quadtree(renderer, q->nw, shade, shade_increment);
-  }
-
-  if (q->ne) {
-    draw_quadtree(renderer, q->ne, shade, shade_increment);
-  }
-
-  if (q->sw) {
-    draw_quadtree(renderer, q->sw, shade, shade_increment);
-  }
-
-  if (q->se) {
-    draw_quadtree(renderer, q->se, shade, shade_increment);
-  }
-}
-
-void draw_boid(SDL_Renderer *renderer, int id) {
-  float cx = g_boids[id].x;
-  float cy = g_boids[id].y;
-
-  float current_heading = g_boids[id].current_heading;
-
-  float x1 = cx + BOID_LENGTH * cos(current_heading);
-  float y1 = cy + BOID_LENGTH * sin(current_heading);
-
-  float x2 = cx + BOID_LENGTH * cos(current_heading + M_PI / 2) * 0.25;
-  float y2 = cy + BOID_LENGTH * sin(current_heading + M_PI / 2) * 0.25;
-
-  float x3 = cx + BOID_LENGTH * cos(current_heading - M_PI / 2) * 0.25;
-  float y3 = cy + BOID_LENGTH * sin(current_heading - M_PI / 2) * 0.25;
-
-  filledTrigonRGBA(renderer, x1, y1, x2, y2, x3, y3, BOID_SHADE, BOID_SHADE,
-                   BOID_SHADE, 0xff);
-}
-
-void draw_boids(SDL_Renderer *renderer, bool debug_view, struct Quadtree *q) {
-  if (debug_view) {
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-    draw_quadtree(renderer, q, QUADTREE_STARTING_SHADE,
-                  QUADTREE_SHADE_INCREMENT);
-  }
-
-  for (int i = 0; i < g_num_boids; i++) {
-    draw_boid(renderer, i);
-
-    if (i == 0 && debug_view == true) {
-      aacircleRGBA(renderer, g_boids[i].x, g_boids[i].y, RADIUS_MAX, 0xff, 0xff,
-                   0xff, 0xff);
-
-      aacircleRGBA(renderer, g_boids[i].x, g_boids[i].y, RADIUS_MIN, 0xff, 0xff,
-                   0xff, 0xff);
-
-      int ind_len = 10;
-      {
-        float x1 = g_boids[i].x;
-        float y1 = g_boids[i].y;
-        float x2 = x1 + ind_len * cos(g_boids[i].rule1_heading);
-        float y2 = y1 + ind_len * sin(g_boids[i].rule1_heading);
-        SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff);
-        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-      }
-
-      {
-        float x1 = g_boids[i].x;
-        float y1 = g_boids[i].y;
-        float x2 = x1 + ind_len * cos(g_boids[i].rule2_heading);
-        float y2 = y1 + ind_len * sin(g_boids[i].rule2_heading);
-        SDL_SetRenderDrawColor(renderer, 0, 0xff, 0, 0xff);
-        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-      }
-
-      {
-        float x1 = g_boids[i].x;
-        float y1 = g_boids[i].y;
-        float x2 = x1 + ind_len * cos(g_boids[i].rule3_heading);
-        float y2 = y1 + ind_len * sin(g_boids[i].rule3_heading);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0xff, 0xff);
-        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-      }
-    }
   }
 }
 
@@ -415,7 +292,7 @@ int main(int argc, char *argv[]) {
       quadtree_insert(&q, i, g_boids[i].x, g_boids[i].y);
     }
 
-    draw_boids(renderer, debug_view, &q);
+    draw_boids(renderer, g_boids, g_num_boids, debug_view, &q);
 
     quadtree_free(&q);
 
