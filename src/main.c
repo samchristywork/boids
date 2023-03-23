@@ -22,17 +22,6 @@
 
 float g_fps = 0;
 int g_num_boids = 0;
-
-struct Boid {
-  float x;
-  float y;
-  float current_heading;
-  float rule1_heading;
-  float rule2_heading;
-  float rule3_heading;
-  float rule4_heading;
-};
-
 struct Boid g_boids[MAX_BOIDS];
 
 float random_float(float low, float high) {
