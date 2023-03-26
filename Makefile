@@ -5,17 +5,12 @@ CFLAGS := -I src/
 .PHONY: all
 all: build/main
 
-build/render.o: src/render.*
-	mkdir -p build/
-	${CC} ${CFLAGS} -c ./src/render.c -o $@ ${CFLAGS}
+.PHONY: objects
+objects: $(patsubst src/%.c, build/%.o, $(wildcard src/*.c))
 
-build/quadtree.o: src/quadtree.*
-	mkdir -p build/
-	${CC} ${CFLAGS} -c ./src/quadtree.c -o $@ ${CFLAGS}
-
-build/main.o: src/main.c
-	mkdir -p build/
-	${CC} ${CFLAGS} -c ./src/main.c -o $@ ${CFLAGS}
+build/%.o: src/%.c
+	mkdir -p build
+	$(CC) -c $(CFLAGS) $< -o $@
 
 build/main: build/main.o build/quadtree.o build/render.o
 	${CC} build/*.o ${LIBS} -o $@
