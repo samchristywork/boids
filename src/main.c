@@ -69,14 +69,20 @@ void rule1(int idx, struct Quadtree *q) {
 }
 
 // alignment: steer towards the average heading of local flockmates
-void rule2(int idx) {
+void rule2(int idx, struct Quadtree *q) {
   g_boids[idx].rule2_heading = g_boids[idx].current_heading;
 
   float sum_x_heading = 0;
   float sum_y_heading = 0;
   int n = 0;
 
-  for (int i = 0; i < g_num_boids; i++) {
+  int length;
+  int *nearby = quadtree_query(q, g_boids[idx].x - RADIUS_MAX / 2,
+                               g_boids[idx].y - RADIUS_MAX / 2, RADIUS_MAX,
+                               RADIUS_MAX, &length);
+
+  for (int j = 0; j < length; j++) {
+    int i=nearby[j];
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
@@ -87,6 +93,8 @@ void rule2(int idx) {
     }
   }
 
+  free(nearby);
+
   if (n != 0) {
     g_boids[idx].rule2_heading = atan2(sum_y_heading, sum_x_heading);
   }
@@ -94,14 +102,20 @@ void rule2(int idx) {
 
 // cohesion: steer to move towards the average position (center of mass) of
 // local flockmates
-void rule3(int idx) {
+void rule3(int idx, struct Quadtree *q) {
   g_boids[idx].rule3_heading = g_boids[idx].current_heading;
 
   float sum_x_mass = 0;
   float sum_y_mass = 0;
   int n = 0;
 
-  for (int i = 0; i < g_num_boids; i++) {
+  int length;
+  int *nearby = quadtree_query(q, g_boids[idx].x - RADIUS_MAX / 2,
+                               g_boids[idx].y - RADIUS_MAX / 2, RADIUS_MAX,
+                               RADIUS_MAX, &length);
+
+  for (int j = 0; j < length; j++) {
+    int i=nearby[j];
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
@@ -112,6 +126,8 @@ void rule3(int idx) {
     }
   }
 
+  free(nearby);
+
   if (n != 0) {
     float dx = sum_x_mass / (float)n - g_boids[idx].x;
     float dy = sum_y_mass / (float)n - g_boids[idx].y;
@@ -120,13 +136,14 @@ void rule3(int idx) {
 }
 
 // noise: steer in random directions
-void rule4(int idx) {
+void rule4(int idx, struct Quadtree *q) {
   g_boids[idx].rule4_heading = g_boids[idx].current_heading;
 
   g_boids[idx].rule4_heading += random_float(-0.1, 0.1);
 }
 
-void simulate_boids(void) {
+
+void simulate_boids(struct Quadtree *q) {
 
   for (int i = 0; i < g_num_boids; i++) {
     g_boids[i].x += BOID_SPEED * cos(g_boids[i].current_heading);
@@ -150,10 +167,10 @@ void simulate_boids(void) {
   }
 
   for (int i = 0; i < g_num_boids; i++) {
-    rule1(i);
-    rule2(i);
-    rule3(i);
-    rule4(i);
+    rule1(i, q);
+    rule2(i, q);
+    rule3(i, q);
+    rule4(i, q);
   }
 
   for (int i = 0; i < g_num_boids; i++) {
