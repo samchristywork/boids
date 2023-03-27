@@ -70,8 +70,12 @@ void quadtree_insert(struct Quadtree *q, int id, float x, float y) {
       q->se->h = q->h / 2;
 
       for (int i = 0; i < QUADTREE_MAX_CHILDREN; i++) {
+        q->data[i].id = 0;
+        q->data[i].x = 0;
+        q->data[i].y = 0;
         quadtree_insert(q, q->data[i].id, q->data[i].x, q->data[i].y);
       }
+      q->numChildren = 0;
       quadtree_insert(q, id, x, y);
     }
   }
