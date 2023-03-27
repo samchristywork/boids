@@ -99,3 +99,44 @@ bool rect_intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2,
                      int h2) {
   return !(x1 + w1 < x2 || x2 + w2 < x1 || y1 + h1 < y2 || y2 + h2 < y1);
 }
+
+int *quadtree_query(struct Quadtree *q, int x, int y, int w, int h,
+                    int *length) {
+  if (rect_intersects(x, y, w, h, q->x, q->y, q->w, q->h)) {
+    if (q->nw) {
+      int r1len, r2len, r3len, r4len;
+      int *r1 = quadtree_query(q->nw, x, y, w, h, &r1len);
+      int *r2 = quadtree_query(q->ne, x, y, w, h, &r2len);
+      int *r3 = quadtree_query(q->sw, x, y, w, h, &r3len);
+      int *r4 = quadtree_query(q->se, x, y, w, h, &r4len);
+      *length = r1len + r2len + r3len + r4len;
+
+      int *ret = malloc(sizeof(int) * (*length));
+
+      int c = 0;
+      for (int i = 0; i < r1len; i++) {
+        ret[c] = r1[i];
+        c++;
+      }
+      for (int i = 0; i < r2len; i++) {
+        ret[c] = r2[i];
+        c++;
+      }
+      for (int i = 0; i < r3len; i++) {
+        ret[c] = r3[i];
+        c++;
+      }
+      for (int i = 0; i < r4len; i++) {
+        ret[c] = r4[i];
+        c++;
+      }
+
+      free(r1);
+      free(r2);
+      free(r3);
+      free(r4);
+
+      return ret;
+    }
+  }
+}
