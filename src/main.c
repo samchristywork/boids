@@ -45,10 +45,16 @@ float boid_dist_2(int a, int b) {
 float boid_dist(int a, int b) { return sqrt(boid_dist_2(a, b)); }
 
 // separation: steer to avoid crowding local flockmates
-void rule1(int idx) {
+void rule1(int idx, struct Quadtree *q) {
   g_boids[idx].rule1_heading = g_boids[idx].current_heading;
 
-  for (int i = 0; i < g_num_boids; i++) {
+  int length;
+  int *nearby = quadtree_query(q, g_boids[idx].x - RADIUS_MIN / 2,
+                               g_boids[idx].y - RADIUS_MIN / 2, RADIUS_MIN,
+                               RADIUS_MIN, &length);
+
+  for (int j = 0; j < length; j++) {
+    int i=nearby[j];
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MIN) {
@@ -58,6 +64,8 @@ void rule1(int idx) {
       }
     }
   }
+
+  free(nearby);
 }
 
 // alignment: steer towards the average heading of local flockmates
