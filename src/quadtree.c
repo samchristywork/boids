@@ -137,6 +137,15 @@ int *quadtree_query(struct Quadtree *q, int x, int y, int w, int h,
       free(r4);
 
       return ret;
+    } else {
+      int *ret = malloc(sizeof(int));
+      ret[0] = q->data->id;
+      *length = 1;
+      return ret;
     }
   }
+
+  int *ret = malloc(0);
+  *length = 0;
+  return ret;
 }
