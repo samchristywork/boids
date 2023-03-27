@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -76,8 +77,8 @@ void quadtree_insert(struct Quadtree *q, int id, float x, float y) {
   }
 }
 
-void quadtree_free(struct Quadtree *q){
-  if(q->nw){
+void quadtree_free(struct Quadtree *q) {
+  if (q->nw) {
     quadtree_free(q->nw);
     quadtree_free(q->ne);
     quadtree_free(q->sw);
@@ -88,4 +89,9 @@ void quadtree_free(struct Quadtree *q){
     free(q->sw);
     free(q->se);
   }
+}
+
+bool rect_intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2,
+                     int h2) {
+  return !(x1 + w1 < x2 || x2 + w2 < x1 || y1 + h1 < y2 || y2 + h2 < y1);
 }
