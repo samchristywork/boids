@@ -19,10 +19,12 @@ float random_float(float low, float high) {
 }
 
 void add_boid() {
-  g_boids[g_num_boids].x = random_float(0, WIDTH);
-  g_boids[g_num_boids].y = random_float(0, HEIGHT);
-  g_boids[g_num_boids].current_heading = random_float(0, 3.141 * 2);
-  g_num_boids++;
+  if (g_num_boids < MAX_BOIDS) {
+    g_boids[g_num_boids].x = random_float(0, WIDTH);
+    g_boids[g_num_boids].y = random_float(0, HEIGHT);
+    g_boids[g_num_boids].current_heading = random_float(0, 3.141 * 2);
+    g_num_boids++;
+  }
 }
 
 void remove_boid() { g_num_boids--; }
