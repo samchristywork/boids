@@ -321,12 +321,12 @@ int main(int argc, char *argv[]) {
 
     draw_boids(renderer, g_boids, g_num_boids, debug_view, &q);
 
-    quadtree_free(&q);
-
     if (!paused) {
-      simulate_boids();
+      simulate_boids(&q);
       frame++;
     }
+
+    quadtree_free(&q);
 
     char frame_text[256];
     snprintf(frame_text, 255, "Frame: %d", frame);
