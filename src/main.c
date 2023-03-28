@@ -54,7 +54,7 @@ void rule1(int idx, struct Quadtree *q) {
                                RADIUS_MIN, &length);
 
   for (int j = 0; j < length; j++) {
-    int i=nearby[j];
+    int i = nearby[j];
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MIN) {
@@ -82,7 +82,7 @@ void rule2(int idx, struct Quadtree *q) {
                                RADIUS_MAX, &length);
 
   for (int j = 0; j < length; j++) {
-    int i=nearby[j];
+    int i = nearby[j];
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
@@ -115,7 +115,7 @@ void rule3(int idx, struct Quadtree *q) {
                                RADIUS_MAX, &length);
 
   for (int j = 0; j < length; j++) {
-    int i=nearby[j];
+    int i = nearby[j];
     if (i != idx) {
       float dist = boid_dist(idx, i);
       if (dist < RADIUS_MAX) {
@@ -176,22 +176,24 @@ void simulate_boids(struct Quadtree *q) {
   for (int i = 0; i < g_num_boids; i++) {
 
     float heading_weight = 1.0;
-    float rule1_weight = 0.04;
-    float rule2_weight = 0.01;
-    float rule3_weight = 0.0025;
-    float rule4_weight = 0.0;
+    float weights[] = {
+        0.04,
+        0.01,
+        0.0025,
+        0.0,
+    };
 
     float new_x = heading_weight * cos(g_boids[i].current_heading) +
-                  rule1_weight * cos(g_boids[i].headings[0]) +
-                  rule2_weight * cos(g_boids[i].headings[1]) +
-                  rule3_weight * cos(g_boids[i].headings[2]) +
-                  rule4_weight * cos(g_boids[i].headings[3]);
+                  weights[0] * cos(g_boids[i].headings[0]) +
+                  weights[1] * cos(g_boids[i].headings[1]) +
+                  weights[2] * cos(g_boids[i].headings[2]) +
+                  weights[3] * cos(g_boids[i].headings[3]);
 
     float new_y = heading_weight * sin(g_boids[i].current_heading) +
-                  rule1_weight * sin(g_boids[i].headings[0]) +
-                  rule2_weight * sin(g_boids[i].headings[1]) +
-                  rule3_weight * sin(g_boids[i].headings[2]) +
-                  rule4_weight * sin(g_boids[i].headings[3]);
+                  weights[0] * sin(g_boids[i].headings[0]) +
+                  weights[1] * sin(g_boids[i].headings[1]) +
+                  weights[2] * sin(g_boids[i].headings[2]) +
+                  weights[3] * sin(g_boids[i].headings[3]);
 
     g_boids[i].current_heading = atan2(new_y, new_x);
 
