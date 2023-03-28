@@ -10,7 +10,6 @@
 #include <quadtree.h>
 #include <render.h>
 
-float g_fps = 0;
 int g_num_boids = 0;
 struct Boid g_boids[MAX_BOIDS];
 
@@ -203,6 +202,7 @@ void simulate_boids(struct Quadtree *q) {
 }
 
 int main(int argc, char *argv[]) {
+  float fps = 0;
   int frame = 0;
   int target_fps = 60;
 
@@ -335,7 +335,7 @@ int main(int argc, char *argv[]) {
     draw_text(renderer, font, 0, 0, white, frame_text);
 
     char framerate_text[256];
-    snprintf(framerate_text, 255, "FPS: %d", (int)g_fps);
+    snprintf(framerate_text, 255, "FPS: %d", (int)fps);
     draw_text(renderer, font, 0, 16, white, framerate_text);
 
     char num_boids_text[256];
@@ -362,7 +362,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (frame % 10 == 0) {
-      g_fps = 1000.0 / (SDL_GetTicks() - begin);
+      fps = 1000.0 / (SDL_GetTicks() - begin);
     }
   }
 
