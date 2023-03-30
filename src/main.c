@@ -204,7 +204,7 @@ void simulate_boids(struct Quadtree *q) {
 int main(int argc, char *argv[]) {
   float fps = 0;
   int frame = 0;
-  int target_fps = 60;
+  int target_fps = 0;
 
   add_arg('c', "no-cap-framerate", "Start with a uncapped framerate.");
   add_arg('d', "debug", "Start with debug view enabled.");
@@ -225,6 +225,10 @@ int main(int argc, char *argv[]) {
   if (get_value('f')) {
     target_fps = atoi(get_value('f'));
     cap_framerate = true;
+  }
+
+  if (!target_fps) {
+    target_fps = 60;
   }
 
   int num_boids = 256;
