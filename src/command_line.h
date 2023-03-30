@@ -23,7 +23,7 @@ void set_arg_function(void (*function)(), char short_name) {
   }
 }
 
-void add_arg(char short_name, char *longName, char *description) {
+void add_arg(char short_name, const char *longName, const char *description) {
   int idx = short_name - 'a';
 
   if (idx >= 0 && idx < 26) {
@@ -49,10 +49,12 @@ char *get_value(char short_name) {
   int idx = short_name - 'a';
 
   if (idx >= 0 && idx < 26) {
-    return g_arguments[idx].value;
+    if (g_arguments[idx].value) {
+      return g_arguments[idx].value;
+    }
   }
 
-  return NULL;
+  return (char *)malloc(0);
 }
 
 void usage() {
@@ -83,10 +85,12 @@ void parse_opts(int argc, char *argv[]) {
         // Short opts
         if (argv[i][1] != '-') {
           for (int j = 1; j < strlen(argv[i]); j++) {
-            last_arg = argv[i][j] - 'a';
-            g_arguments[last_arg].set = 1;
-            if (g_arguments[last_arg].function) {
-              g_arguments[last_arg].function();
+            if (argv[i][j] >= 'a' && argv[i][j] <= 'z') {
+              last_arg = argv[i][j] - 'a';
+              g_arguments[last_arg].set = 1;
+              if (g_arguments[last_arg].function) {
+                g_arguments[last_arg].function();
+              }
             }
           }
 
