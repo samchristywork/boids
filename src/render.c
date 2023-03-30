@@ -90,8 +90,8 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
       {
         float x1 = boids[i].x;
         float y1 = boids[i].y;
-        float x2 = x1 + ind_len * cos(boids[i].rule1_heading);
-        float y2 = y1 + ind_len * sin(boids[i].rule1_heading);
+        float x2 = x1 + ind_len * cos(boids[i].headings[0]);
+        float y2 = y1 + ind_len * sin(boids[i].headings[0]);
         SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
@@ -99,8 +99,8 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
       {
         float x1 = boids[i].x;
         float y1 = boids[i].y;
-        float x2 = x1 + ind_len * cos(boids[i].rule2_heading);
-        float y2 = y1 + ind_len * sin(boids[i].rule2_heading);
+        float x2 = x1 + ind_len * cos(boids[i].headings[1]);
+        float y2 = y1 + ind_len * sin(boids[i].headings[1]);
         SDL_SetRenderDrawColor(renderer, 0, 0xff, 0, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
@@ -108,8 +108,8 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
       {
         float x1 = boids[i].x;
         float y1 = boids[i].y;
-        float x2 = x1 + ind_len * cos(boids[i].rule3_heading);
-        float y2 = y1 + ind_len * sin(boids[i].rule3_heading);
+        float x2 = x1 + ind_len * cos(boids[i].headings[2]);
+        float y2 = y1 + ind_len * sin(boids[i].headings[2]);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0xff, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
