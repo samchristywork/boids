@@ -232,7 +232,7 @@ int main(int argc, char *argv[]) {
   }
 
   int num_boids = 256;
-  if (get_value('n')) {
+  if (get_is_set('n')) {
     num_boids = atoi(get_value('n'));
 
     if (num_boids < 0) {
