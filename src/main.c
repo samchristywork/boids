@@ -10,6 +10,30 @@
 #include <quadtree.h>
 #include <render.h>
 
+void render(SDL_Renderer *renderer, struct Boid *boids, int num_boids,
+            int frame, int fps, SDL_Color white, struct Quadtree *q,
+            TTF_Font *font, bool debug_view) {
+  int shade = 0x07;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderClear(renderer);
+
+  draw_boids(renderer, boids, num_boids, debug_view, q);
+
+  char frame_text[256];
+  snprintf(frame_text, 255, "Frame: %d", frame);
+  draw_text(renderer, font, 0, 0, white, frame_text);
+
+  char framerate_text[256];
+  snprintf(framerate_text, 255, "FPS: %d", (int)fps);
+  draw_text(renderer, font, 0, 16, white, framerate_text);
+
+  char num_boids_text[256];
+  snprintf(num_boids_text, 255, "Boids: %d", (int)num_boids);
+  draw_text(renderer, font, 0, 32, white, num_boids_text);
+
+  SDL_RenderPresent(renderer);
+}
+
 float random_float(float low, float high) {
   return low + (high - low) * (float)rand() / (float)RAND_MAX;
 }
@@ -317,10 +341,6 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    int shade = 0x07;
-    SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
-    SDL_RenderClear(renderer);
-
     struct Quadtree q = {0};
     q.w = WIDTH;
     q.h = HEIGHT;
@@ -329,7 +349,7 @@ int main(int argc, char *argv[]) {
       quadtree_insert(&q, i, boids[i].x, boids[i].y);
     }
 
-    draw_boids(renderer, boids, num_boids, debug_view, &q);
+    render(renderer, boids, num_boids, frame, fps, white, &q, font, debug_view);
 
     if (!paused) {
       simulate_boids(boids, num_boids, &q);
@@ -337,20 +357,6 @@ int main(int argc, char *argv[]) {
     }
 
     quadtree_free(&q);
-
-    char frame_text[256];
-    snprintf(frame_text, 255, "Frame: %d", frame);
-    draw_text(renderer, font, 0, 0, white, frame_text);
-
-    char framerate_text[256];
-    snprintf(framerate_text, 255, "FPS: %d", (int)fps);
-    draw_text(renderer, font, 0, 16, white, framerate_text);
-
-    char num_boids_text[256];
-    snprintf(num_boids_text, 255, "Boids: %d", (int)num_boids);
-    draw_text(renderer, font, 0, 32, white, num_boids_text);
-
-    SDL_RenderPresent(renderer);
 
     Uint32 end = SDL_GetTicks();
     if (cap_framerate) {
