@@ -10,41 +10,40 @@
 #include <quadtree.h>
 #include <render.h>
 
-int g_num_boids = 0;
-struct Boid g_boids[MAX_BOIDS];
-
 float random_float(float low, float high) {
   return low + (high - low) * (float)rand() / (float)RAND_MAX;
 }
 
-void add_boid() {
-  if (g_num_boids < MAX_BOIDS) {
-    g_boids[g_num_boids].x = random_float(0, WIDTH);
-    g_boids[g_num_boids].y = random_float(0, HEIGHT);
-    g_boids[g_num_boids].currentHeading = random_float(0, 3.141 * 2);
-    g_num_boids++;
+void add_boid(struct Boid *g_boids, int *g_num_boids) {
+  if (*g_num_boids < MAX_BOIDS) {
+    g_boids[*g_num_boids].x = random_float(0, WIDTH);
+    g_boids[*g_num_boids].y = random_float(0, HEIGHT);
+    g_boids[*g_num_boids].currentHeading = random_float(0, 3.141 * 2);
+    (*g_num_boids)++;
   }
 }
 
-void remove_boid() { g_num_boids--; }
+void remove_boid(int *g_num_boids) { (*g_num_boids)--; }
 
-void initialize_positions(int n) {
+int initialize_positions(struct Boid *g_boids, int n) {
+  int g_num_boids=0;
   for (int i = 0; i < n; i++) {
-    add_boid();
+    add_boid(g_boids, &g_num_boids);
   }
+  return g_num_boids;
 }
 
-float boid_dist_2(int a, int b) {
+float boid_dist_2(struct Boid *g_boids, int a, int b) {
   float dx = g_boids[a].x - g_boids[b].x;
   float dy = g_boids[a].y - g_boids[b].y;
 
   return dx * dx + dy * dy;
 }
 
-float boid_dist(int a, int b) { return sqrt(boid_dist_2(a, b)); }
+float boid_dist(struct Boid *g_boids, int a, int b) { return sqrt(boid_dist_2(g_boids, a, b)); }
 
 // separation: steer to avoid crowding local flockmates
-void rule1(int idx, struct Quadtree *q) {
+void rule1(struct Boid *g_boids, int idx, struct Quadtree *q) {
   g_boids[idx].headings[0] = g_boids[idx].currentHeading;
 
   int length;
@@ -55,7 +54,7 @@ void rule1(int idx, struct Quadtree *q) {
   for (int j = 0; j < length; j++) {
     int i = nearby[j];
     if (i != idx) {
-      float dist = boid_dist(idx, i);
+      float dist = boid_dist(g_boids, idx, i);
       if (dist < RADIUS_MIN) {
         float dx = g_boids[idx].x - g_boids[i].x;
         float dy = g_boids[idx].y - g_boids[i].y;
@@ -68,7 +67,7 @@ void rule1(int idx, struct Quadtree *q) {
 }
 
 // alignment: steer towards the average heading of local flockmates
-void rule2(int idx, struct Quadtree *q) {
+void rule2(struct Boid *g_boids, int idx, struct Quadtree *q) {
   g_boids[idx].headings[1] = g_boids[idx].currentHeading;
 
   float sum_x_heading = 0;
@@ -83,7 +82,7 @@ void rule2(int idx, struct Quadtree *q) {
   for (int j = 0; j < length; j++) {
     int i = nearby[j];
     if (i != idx) {
-      float dist = boid_dist(idx, i);
+      float dist = boid_dist(g_boids, idx, i);
       if (dist < RADIUS_MAX) {
         sum_x_heading += cos(g_boids[i].currentHeading);
         sum_y_heading += sin(g_boids[i].currentHeading);
@@ -101,7 +100,7 @@ void rule2(int idx, struct Quadtree *q) {
 
 // cohesion: steer to move towards the average position (center of mass) of
 // local flockmates
-void rule3(int idx, struct Quadtree *q) {
+void rule3(struct Boid *g_boids, int idx, struct Quadtree *q) {
   g_boids[idx].headings[2] = g_boids[idx].currentHeading;
 
   float sum_x_mass = 0;
@@ -116,7 +115,7 @@ void rule3(int idx, struct Quadtree *q) {
   for (int j = 0; j < length; j++) {
     int i = nearby[j];
     if (i != idx) {
-      float dist = boid_dist(idx, i);
+      float dist = boid_dist(g_boids, idx, i);
       if (dist < RADIUS_MAX) {
         sum_x_mass += g_boids[i].x;
         sum_y_mass += g_boids[i].y;
@@ -135,14 +134,14 @@ void rule3(int idx, struct Quadtree *q) {
 }
 
 // noise: steer in random directions
-void rule4(int idx, struct Quadtree *q) {
+void rule4(struct Boid *g_boids, int idx, struct Quadtree *q) {
   g_boids[idx].headings[3] = g_boids[idx].currentHeading;
 
   g_boids[idx].headings[3] += random_float(-0.1, 0.1);
 }
 
 
-void simulate_boids(struct Quadtree *q) {
+void simulate_boids(struct Boid *g_boids, int g_num_boids, struct Quadtree *q) {
 
   for (int i = 0; i < g_num_boids; i++) {
     g_boids[i].x += BOID_SPEED * cos(g_boids[i].currentHeading);
@@ -166,10 +165,10 @@ void simulate_boids(struct Quadtree *q) {
   }
 
   for (int i = 0; i < g_num_boids; i++) {
-    rule1(i, q);
-    rule2(i, q);
-    rule3(i, q);
-    rule4(i, q);
+    rule1(g_boids, i, q);
+    rule2(g_boids, i, q);
+    rule3(g_boids, i, q);
+    rule4(g_boids, i, q);
   }
 
   for (int i = 0; i < g_num_boids; i++) {
@@ -202,6 +201,9 @@ void simulate_boids(struct Quadtree *q) {
 }
 
 int main(int argc, char *argv[]) {
+  int g_num_boids = 0;
+  struct Boid g_boids[MAX_BOIDS];
+
   float fps = 0;
   int frame = 0;
   int target_fps = 0;
@@ -231,16 +233,16 @@ int main(int argc, char *argv[]) {
     target_fps = 60;
   }
 
-  int num_boids = 256;
+  int target_boids = 1000;
   if (get_is_set('n')) {
-    num_boids = atoi(get_value('n'));
+    target_boids = atoi(get_value('n'));
 
-    if (num_boids < 0) {
-      num_boids = 0;
+    if (target_boids < 0) {
+      target_boids = 0;
     }
 
-    if (num_boids > MAX_BOIDS) {
-      num_boids = MAX_BOIDS;
+    if (target_boids > MAX_BOIDS) {
+      target_boids = MAX_BOIDS;
     }
   }
 
@@ -250,7 +252,7 @@ int main(int argc, char *argv[]) {
     srand(time(0));
   }
 
-  initialize_positions(num_boids);
+  g_num_boids=initialize_positions(g_boids, target_boids);
 
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   TTF_Init();
@@ -321,14 +323,14 @@ int main(int argc, char *argv[]) {
     q.w = WIDTH;
     q.h = HEIGHT;
 
-    for (int i = 0; i < g_num_boids; i++) {
+    for (int i = 0; i < target_boids; i++) {
       quadtree_insert(&q, i, g_boids[i].x, g_boids[i].y);
     }
 
     draw_boids(renderer, g_boids, g_num_boids, debug_view, &q);
 
     if (!paused) {
-      simulate_boids(&q);
+      simulate_boids(g_boids, g_num_boids, &q);
       frame++;
     }
 
@@ -354,12 +356,12 @@ int main(int argc, char *argv[]) {
       if (delay > 0) {
         SDL_Delay(delay);
         if (dynamic) {
-          add_boid();
+          add_boid(g_boids, &g_num_boids);
         }
       } else {
         if (dynamic) {
           if (frame % 100 == 0) {
-            remove_boid();
+            remove_boid(&g_num_boids);
           }
         }
       }
