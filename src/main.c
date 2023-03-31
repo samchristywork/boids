@@ -73,8 +73,8 @@ void rule1(struct Boid *boids, int idx, struct Quadtree *q) {
   boids[idx].headings[0] = boids[idx].currentHeading;
 
   int length;
-  int *nearby = quadtree_query(q, boids[idx].x - RADIUS_MIN / 2,
-                               boids[idx].y - RADIUS_MIN / 2, RADIUS_MIN,
+  int *nearby = quadtree_query(q, boids[idx].x - RADIUS_MIN / 2.0,
+                               boids[idx].y - RADIUS_MIN / 2.0, RADIUS_MIN,
                                RADIUS_MIN, &length);
 
   for (int j = 0; j < length; j++) {
@@ -101,8 +101,8 @@ void rule2(struct Boid *boids, int idx, struct Quadtree *q) {
   int n = 0;
 
   int length;
-  int *nearby = quadtree_query(q, boids[idx].x - RADIUS_MAX / 2,
-                               boids[idx].y - RADIUS_MAX / 2, RADIUS_MAX,
+  int *nearby = quadtree_query(q, boids[idx].x - RADIUS_MAX / 2.0,
+                               boids[idx].y - RADIUS_MAX / 2.0, RADIUS_MAX,
                                RADIUS_MAX, &length);
 
   for (int j = 0; j < length; j++) {
@@ -134,8 +134,8 @@ void rule3(struct Boid *boids, int idx, struct Quadtree *q) {
   int n = 0;
 
   int length;
-  int *nearby = quadtree_query(q, boids[idx].x - RADIUS_MAX / 2,
-                               boids[idx].y - RADIUS_MAX / 2, RADIUS_MAX,
+  int *nearby = quadtree_query(q, boids[idx].x - RADIUS_MAX / 2.0,
+                               boids[idx].y - RADIUS_MAX / 2.0, RADIUS_MAX,
                                RADIUS_MAX, &length);
 
   for (int j = 0; j < length; j++) {
