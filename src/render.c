@@ -53,16 +53,16 @@ void draw_boid(SDL_Renderer *renderer, struct Boid *boid, int id) {
   float cx = boid->x;
   float cy = boid->y;
 
-  float current_heading = boid->current_heading;
+  float currentHeading = boid->currentHeading;
 
-  float x1 = cx + BOID_LENGTH * cos(current_heading);
-  float y1 = cy + BOID_LENGTH * sin(current_heading);
+  float x1 = cx + BOID_LENGTH * cos(currentHeading);
+  float y1 = cy + BOID_LENGTH * sin(currentHeading);
 
-  float x2 = cx + BOID_LENGTH * cos(current_heading + M_PI / 2) * 0.25;
-  float y2 = cy + BOID_LENGTH * sin(current_heading + M_PI / 2) * 0.25;
+  float x2 = cx + BOID_LENGTH * cos(currentHeading + M_PI / 2) * 0.25;
+  float y2 = cy + BOID_LENGTH * sin(currentHeading + M_PI / 2) * 0.25;
 
-  float x3 = cx + BOID_LENGTH * cos(current_heading - M_PI / 2) * 0.25;
-  float y3 = cy + BOID_LENGTH * sin(current_heading - M_PI / 2) * 0.25;
+  float x3 = cx + BOID_LENGTH * cos(currentHeading - M_PI / 2) * 0.25;
+  float y3 = cy + BOID_LENGTH * sin(currentHeading - M_PI / 2) * 0.25;
 
   filledTrigonRGBA(renderer, x1, y1, x2, y2, x3, y3, BOID_SHADE, BOID_SHADE,
                    BOID_SHADE, 0xff);
