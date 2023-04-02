@@ -75,8 +75,9 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
 }
 
 void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
-            int num_boids, int frame, int fps, SDL_Color white,
-            struct Quadtree *q, TTF_Font *font, bool debug_view) {
+            int num_boids, struct Widget *widgets, int num_widgets, int frame,
+            int fps, SDL_Color white, struct Quadtree *q, TTF_Font *font,
+            bool debug_view) {
 
   int w;
   int h;
@@ -100,7 +101,10 @@ void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
   snprintf(num_boids_text, 255, "Boids: %d", (int)num_boids);
   draw_text(renderer, font, 0, 32, white, num_boids_text);
 
-  draw_slider(renderer, font, w, h, 0.5, 1.0, 0.75);
+  for (int i = 0; i < num_widgets; i++) {
+    draw_slider(renderer, font, w, h - 30 * i, widgets[i].min, widgets[i].max,
+                widgets[i].value);
+  }
 
   SDL_RenderPresent(renderer);
 }
@@ -301,6 +305,21 @@ int main(int argc, char *argv[]) {
   int num_boids = 0;
   struct Boid boids[MAX_BOIDS];
 
+  int num_widgets=3;
+  struct Widget widgets[num_widgets];
+
+  widgets[0].min=0.5;
+  widgets[0].max=0.75;
+  widgets[0].value=0.75;
+
+  widgets[1].min=0.5;
+  widgets[1].max=0.75;
+  widgets[1].value=0.75;
+
+  widgets[2].min=0.5;
+  widgets[2].max=0.75;
+  widgets[2].value=0.75;
+
   float fps = 0;
   int frame = 0;
   int target_fps = 0;
@@ -438,8 +457,8 @@ int main(int argc, char *argv[]) {
       quadtree_insert(&q, i, boids[i].x, boids[i].y);
     }
 
-    render(renderer, window, boids, num_boids, frame, fps, white, &q, font,
-           debug_view);
+    render(renderer, window, boids, num_boids, widgets, num_widgets, frame, fps,
+           white, &q, font, debug_view);
 
     if (!paused) {
       simulate_boids(boids, num_boids, &q);

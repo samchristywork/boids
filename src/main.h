@@ -8,4 +8,10 @@ struct Boid {
   float headings[4];
 };
 
+struct Widget {
+  float min;
+  float max;
+  float value;
+};
+
 #endif
