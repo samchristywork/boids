@@ -294,6 +294,13 @@ int main(int argc, char *argv[]) {
 
   SDL_Color white = {255, 255, 255};
 
+  static int mouse_x = 0;
+  static int mouse_y = 0;
+
+  int clicked_x = -1;
+  int clicked_y = -1;
+  int clicked_button = -1;
+
   SDL_Event event;
   bool running = true;
   while (running) {
@@ -304,6 +311,17 @@ int main(int argc, char *argv[]) {
 
       case SDL_QUIT:
         running = false;
+        break;
+
+      case SDL_MOUSEMOTION:
+        mouse_x = event.motion.x;
+        mouse_y = event.motion.y;
+        break;
+
+      case SDL_MOUSEBUTTONDOWN:
+        clicked_x = event.button.x;
+        clicked_y = event.button.y;
+        clicked_button = event.button.button;
         break;
 
       case SDL_KEYDOWN:
