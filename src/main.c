@@ -19,7 +19,7 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
   int padding = 10;
   int inner_padding = 40;
 
-  float relative_value = value / (max - min) - max;
+  float relative_value = (value - min) / (max - min);
 
   // Outer
   r.x = padding;
@@ -305,20 +305,20 @@ int main(int argc, char *argv[]) {
   int num_boids = 0;
   struct Boid boids[MAX_BOIDS];
 
-  int num_widgets=3;
+  int num_widgets = 3;
   struct Widget widgets[num_widgets];
 
-  widgets[0].min=0.5;
-  widgets[0].max=0.75;
-  widgets[0].value=0.75;
+  widgets[0].min = 0.5;
+  widgets[0].max = 0.75;
+  widgets[0].value = 0.5;
 
-  widgets[1].min=0.5;
-  widgets[1].max=0.75;
-  widgets[1].value=0.75;
+  widgets[1].min = 0.5;
+  widgets[1].max = 0.75;
+  widgets[1].value = 0.65;
 
-  widgets[2].min=0.5;
-  widgets[2].max=0.75;
-  widgets[2].value=0.75;
+  widgets[2].min = 0.5;
+  widgets[2].max = 0.75;
+  widgets[2].value = 0.75;
 
   float fps = 0;
   int frame = 0;
