@@ -10,6 +10,50 @@
 #include <quadtree.h>
 #include <render.h>
 
+void draw_slider(SDL_Renderer *renderer, int w, int h) {
+  SDL_Rect r;
+  int shade;
+  int width=100;
+  int height=20;
+  int padding=10;
+
+  // Outer
+  r.x = padding;
+  r.y = h-padding-height;
+  r.w = width;
+  r.h = height;
+  shade=0x70;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+
+  // Border
+  r.x = padding;
+  r.y = h-padding-height;
+  r.w = width;
+  r.h = height;
+  shade=0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderDrawRect(renderer, &r);
+
+  // Inner
+  r.x = padding+padding;
+  r.y = h-padding-height+height/2-2;
+  r.w = width-padding-padding;
+  r.h = 4;
+  shade=0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+
+  // Handle
+  r.x = padding+padding;
+  r.y = h-padding-height+height/2-4;
+  r.w = 4;
+  r.h = 8;
+  shade=0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+}
+
 void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
             int num_boids, int frame, int fps, SDL_Color white,
             struct Quadtree *q, TTF_Font *font, bool debug_view) {
@@ -35,6 +79,8 @@ void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
   char num_boids_text[256];
   snprintf(num_boids_text, 255, "Boids: %d", (int)num_boids);
   draw_text(renderer, font, 0, 32, white, num_boids_text);
+
+  draw_slider(renderer, w, h);
 
   SDL_RenderPresent(renderer);
 }
