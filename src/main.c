@@ -19,6 +19,8 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
   int padding = 10;
   int inner_padding = 40;
 
+  float relative_value = value / (max - min) - max;
+
   // Outer
   r.x = padding;
   r.y = h - padding - height;
@@ -47,7 +49,7 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
   SDL_RenderFillRect(renderer, &r);
 
   // Handle
-  r.x = padding + inner_padding + value * (width - inner_padding * 2);
+  r.x = padding + inner_padding + relative_value * (width - inner_padding * 2);
   r.y = h - padding - height + height / 2 - 4;
   r.w = 4;
   r.h = 8;
