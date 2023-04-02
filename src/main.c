@@ -10,7 +10,7 @@
 #include <quadtree.h>
 #include <render.h>
 
-void draw_slider(SDL_Renderer *renderer, int w, int h) {
+void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h) {
   SDL_Rect r;
   int shade;
   int width = 200;
@@ -54,6 +54,19 @@ void draw_slider(SDL_Renderer *renderer, int w, int h) {
   shade = 0xd0;
   SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
   SDL_RenderFillRect(renderer, &r);
+
+  SDL_Color white = {0xff, 0xff, 0xff, 0xff};
+
+  // Left text
+  char buf[10];
+  snprintf(buf, 10, "%2.2f", 0.7f);
+  draw_text(renderer, font, padding + 4, h - padding - height / 2 - 6, white,
+            buf);
+
+  // Right text
+  snprintf(buf, 10, "%2.2f", 1.0f);
+  draw_text(renderer, font, padding + width - 28, h - padding - height / 2 - 6,
+            white, buf);
 }
 
 void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
