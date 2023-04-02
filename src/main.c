@@ -10,9 +10,14 @@
 #include <quadtree.h>
 #include <render.h>
 
-void render(SDL_Renderer *renderer, struct Boid *boids, int num_boids,
-            int frame, int fps, SDL_Color white, struct Quadtree *q,
-            TTF_Font *font, bool debug_view) {
+void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
+            int num_boids, int frame, int fps, SDL_Color white,
+            struct Quadtree *q, TTF_Font *font, bool debug_view) {
+
+  int w;
+  int h;
+  SDL_GetWindowSize(window, &w, &h);
+
   int shade = 0x07;
   SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
   SDL_RenderClear(renderer);
@@ -367,7 +372,8 @@ int main(int argc, char *argv[]) {
       quadtree_insert(&q, i, boids[i].x, boids[i].y);
     }
 
-    render(renderer, boids, num_boids, frame, fps, white, &q, font, debug_view);
+    render(renderer, window, boids, num_boids, frame, fps, white, &q, font,
+           debug_view);
 
     if (!paused) {
       simulate_boids(boids, num_boids, &q);
