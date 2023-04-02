@@ -10,14 +10,14 @@
 #include <quadtree.h>
 #include <render.h>
 
-void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h) {
+void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
+                 float min, float max, float value) {
   SDL_Rect r;
   int shade;
   int width = 200;
   int height = 20;
   int padding = 10;
   int inner_padding = 40;
-  float value = 1;
 
   // Outer
   r.x = padding;
@@ -58,15 +58,18 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h) {
   SDL_Color white = {0xff, 0xff, 0xff, 0xff};
 
   // Left text
-  char buf[10];
-  snprintf(buf, 10, "%2.2f", 0.7f);
+  char buf[100];
+  snprintf(buf, 10, "%2.2f", min);
   draw_text(renderer, font, padding + 4, h - padding - height / 2 - 6, white,
             buf);
 
   // Right text
-  snprintf(buf, 10, "%2.2f", 1.0f);
+  snprintf(buf, 10, "%2.2f", max);
   draw_text(renderer, font, padding + width - 28, h - padding - height / 2 - 6,
             white, buf);
+
+  snprintf(buf, 100, "Value: %2.2f", value);
+  draw_text(renderer, font, 225, h - padding - height / 2 - 6, white, buf);
 }
 
 void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
@@ -95,7 +98,7 @@ void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
   snprintf(num_boids_text, 255, "Boids: %d", (int)num_boids);
   draw_text(renderer, font, 0, 32, white, num_boids_text);
 
-  draw_slider(renderer, font, w, h);
+  draw_slider(renderer, font, w, h, 0.5, 1.0, 0.75);
 
   SDL_RenderPresent(renderer);
 }
