@@ -3,6 +3,19 @@
 #include <main.h>
 #include <render.h>
 
+void transform_to_context(struct Context *parent, struct Context *new, float *x,
+                          float *y) {
+  if (x) {
+    *x += new->x - parent->x;
+    *x /= new->w / parent->w;
+  }
+
+  if (y) {
+    *y += new->y - parent->y;
+    *y /= new->h / parent->h;
+  }
+}
+
 void draw_text(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
                SDL_Color color, char *text) {
   SDL_Surface *textSurface = TTF_RenderText_Solid(font, text, color);
@@ -65,6 +78,10 @@ void draw_boid(SDL_Renderer *renderer, struct Boid *boid, struct Context parent,
 
   float x3 = cx + BOID_LENGTH * cos(currentHeading - M_PI / 2) * 0.25;
   float y3 = cy + BOID_LENGTH * sin(currentHeading - M_PI / 2) * 0.25;
+
+  transform_to_context(&parent, &child, &x1, &y1);
+  transform_to_context(&parent, &child, &x2, &y2);
+  transform_to_context(&parent, &child, &x3, &y3);
 
   filledTrigonRGBA(renderer, x1, y1, x2, y2, x3, y3, BOID_SHADE, BOID_SHADE,
                    BOID_SHADE, 0xff);
