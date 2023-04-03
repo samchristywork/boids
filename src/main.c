@@ -81,8 +81,9 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
 }
 
 void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
-            int num_boids, struct Widget *widgets, int num_widgets, int frame,
-            int fps, SDL_Color white, struct Quadtree *q, TTF_Font *font,
+            int num_boids, struct Widget *widgets, int num_widgets,
+            struct Context parent, struct Context child, int frame, int fps,
+            SDL_Color white, struct Quadtree *q, TTF_Font *font,
             bool debug_view) {
 
   int w;
@@ -93,7 +94,7 @@ void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
   SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
   SDL_RenderClear(renderer);
 
-  draw_boids(renderer, boids, num_boids, debug_view, q);
+  draw_boids(renderer, boids, num_boids, parent, child, debug_view, q);
 
   char frame_text[256];
   snprintf(frame_text, 255, "Frame: %d", frame);
@@ -504,8 +505,20 @@ int main(int argc, char *argv[]) {
       quadtree_insert(&q, i, boids[i].x, boids[i].y);
     }
 
-    render(renderer, window, boids, num_boids, widgets, num_widgets, frame, fps,
-           white, &q, font, debug_view);
+    struct Context parent;
+    parent.x = 0;
+    parent.y = 0;
+    parent.w = WIDTH;
+    parent.h = HEIGHT;
+
+    struct Context child;
+    child.x = 0;
+    child.y = 0;
+    child.w = WIDTH;
+    child.h = HEIGHT;
+
+    render(renderer, window, boids, num_boids, widgets, num_widgets, parent,
+           child, frame, fps, white, &q, font, debug_view);
 
     if (!paused) {
       simulate_boids(boids, num_boids, widgets, num_widgets, &q);

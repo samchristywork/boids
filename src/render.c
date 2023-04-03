@@ -16,7 +16,8 @@ void draw_text(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
   SDL_DestroyTexture(textTexture);
 }
 
-void draw_quadtree(SDL_Renderer *renderer, struct Quadtree *q, int shade,
+void draw_quadtree(SDL_Renderer *renderer, struct Quadtree *q,
+                   struct Context parent, struct Context child, int shade,
                    int shade_increment) {
 
   SDL_Rect rect;
@@ -33,23 +34,24 @@ void draw_quadtree(SDL_Renderer *renderer, struct Quadtree *q, int shade,
   }
 
   if (q->nw) {
-    draw_quadtree(renderer, q->nw, shade, shade_increment);
+    draw_quadtree(renderer, q->nw, parent, child, shade, shade_increment);
   }
 
   if (q->ne) {
-    draw_quadtree(renderer, q->ne, shade, shade_increment);
+    draw_quadtree(renderer, q->ne, parent, child, shade, shade_increment);
   }
 
   if (q->sw) {
-    draw_quadtree(renderer, q->sw, shade, shade_increment);
+    draw_quadtree(renderer, q->sw, parent, child, shade, shade_increment);
   }
 
   if (q->se) {
-    draw_quadtree(renderer, q->se, shade, shade_increment);
+    draw_quadtree(renderer, q->se, parent, child, shade, shade_increment);
   }
 }
 
-void draw_boid(SDL_Renderer *renderer, struct Boid *boid, int id) {
+void draw_boid(SDL_Renderer *renderer, struct Boid *boid, struct Context parent,
+               struct Context child, int id) {
   float cx = boid->x;
   float cy = boid->y;
 
@@ -69,15 +71,16 @@ void draw_boid(SDL_Renderer *renderer, struct Boid *boid, int id) {
 }
 
 void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
-                bool debug_view, struct Quadtree *q) {
+                struct Context parent, struct Context child, bool debug_view,
+                struct Quadtree *q) {
   if (debug_view) {
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-    draw_quadtree(renderer, q, QUADTREE_STARTING_SHADE,
+    draw_quadtree(renderer, q, parent, child, QUADTREE_STARTING_SHADE,
                   QUADTREE_SHADE_INCREMENT);
   }
 
   for (int i = 0; i < num_boids; i++) {
-    draw_boid(renderer, &boids[i], i);
+    draw_boid(renderer, &boids[i], parent, child, i);
 
     if (i == 0 && debug_view == true) {
       aacircleRGBA(renderer, boids[i].x, boids[i].y, RADIUS_MAX, 0xff, 0xff,
