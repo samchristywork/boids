@@ -246,7 +246,6 @@ void rule4(struct Boid *boids, int idx, struct Quadtree *q) {
   boids[idx].headings[3] += random_float(-0.1, 0.1);
 }
 
-
 void simulate_boids(struct Boid *boids, int num_boids, struct Widget *widgets,
                     int num_widgets, struct Quadtree *q) {
 
@@ -282,9 +281,9 @@ void simulate_boids(struct Boid *boids, int num_boids, struct Widget *widgets,
 
     float heading_weight = 1.0;
     float weights[] = {
-        0.04,
-        0.01,
-        0.0025,
+        widgets[2].value,
+        widgets[1].value,
+        widgets[0].value,
         0.0,
     };
 
