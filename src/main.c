@@ -517,6 +517,13 @@ int main(int argc, char *argv[]) {
     child.w = WIDTH;
     child.h = HEIGHT;
 
+    if (lmb_down) {
+      child.x = -mouse_x + WIDTH / 8;
+      child.y = -mouse_y + HEIGHT / 8;
+      child.w = WIDTH / 4;
+      child.h = HEIGHT / 4;
+    }
+
     render(renderer, window, boids, num_boids, widgets, num_widgets, parent,
            child, frame, fps, white, &q, font, debug_view);
 
