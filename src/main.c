@@ -11,15 +11,16 @@
 #include <render.h>
 
 void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
-                 float min, float max, float value) {
+                 struct Widget *widget) {
   SDL_Rect r;
   int shade;
   int width = 200;
   int height = 20;
   int padding = 10;
-  int inner_padding = 40;
+  int inner_padding = 50;
 
-  float relative_value = (value - min) / (max - min);
+  float relative_value =
+      (widget->value - widget->min) / (widget->max - widget->min);
 
   // Outer
   r.x = padding;
@@ -61,16 +62,17 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
 
   // Left text
   char buf[100];
-  snprintf(buf, 10, "%2.2f", min);
+  snprintf(buf, 10, "%4.4f", widget->min);
   draw_text(renderer, font, padding + 4, h - padding - height / 2 - 6, white,
             buf);
 
   // Right text
-  snprintf(buf, 10, "%2.2f", max);
-  draw_text(renderer, font, padding + width - 28, h - padding - height / 2 - 6,
+  snprintf(buf, 10, "%4.4f", widget->max);
+  draw_text(renderer, font, padding + width - 42, h - padding - height / 2 - 6,
             white, buf);
 
-  snprintf(buf, 100, "Value: %2.2f", value);
+  // Value text
+  snprintf(buf, 100, "%s: %4.4f", widget->name, widget->value);
   draw_text(renderer, font, 225, h - padding - height / 2 - 6, white, buf);
 }
 
@@ -102,8 +104,7 @@ void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
   draw_text(renderer, font, 0, 32, white, num_boids_text);
 
   for (int i = 0; i < num_widgets; i++) {
-    draw_slider(renderer, font, w, h - 30 * i, widgets[i].min, widgets[i].max,
-                widgets[i].value);
+    draw_slider(renderer, font, w, h - 30 * i, &widgets[i]);
   }
 
   SDL_RenderPresent(renderer);
@@ -308,17 +309,24 @@ int main(int argc, char *argv[]) {
   int num_widgets = 3;
   struct Widget widgets[num_widgets];
 
-  widgets[0].min = 0.5;
-  widgets[0].max = 0.75;
-  widgets[0].value = 0.5;
+  // Typical values:
+  // Separation 0.04,
+  // Alignment  0.01,
+  // Cohesion   0.0025,
+  widgets[0].min = 0.0;
+  widgets[0].max = 0.005 * 4;
+  widgets[0].value = 0.0025;
+  snprintf(widgets[0].name, 100, "Cohesion");
 
-  widgets[1].min = 0.5;
-  widgets[1].max = 0.75;
-  widgets[1].value = 0.65;
+  widgets[1].min = 0.0;
+  widgets[1].max = 0.02 * 4;
+  widgets[1].value = 0.01;
+  snprintf(widgets[1].name, 100, "Alignment");
 
-  widgets[2].min = 0.5;
-  widgets[2].max = 0.75;
-  widgets[2].value = 0.75;
+  widgets[2].min = 0.0;
+  widgets[2].max = 0.08 * 4;
+  widgets[2].value = 0.04;
+  snprintf(widgets[2].name, 100, "Separation");
 
   float fps = 0;
   int frame = 0;
@@ -461,7 +469,7 @@ int main(int argc, char *argv[]) {
            white, &q, font, debug_view);
 
     if (!paused) {
-      simulate_boids(boids, num_boids, &q);
+      simulate_boids(boids, num_boids, widgets, num_widgets, &q);
       frame++;
     }
 

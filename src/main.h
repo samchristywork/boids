@@ -9,9 +9,14 @@ struct Boid {
 };
 
 struct Widget {
+  char name[100];
   float min;
   float max;
   float value;
+  float minx;
+  float miny;
+  float width;
+  float height;
 };
 
 #endif
