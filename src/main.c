@@ -474,6 +474,14 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    for (int i = 0; i < num_widgets; i++) {
+      if (clicked_x > widgets[i].minx && clicked_y > widgets[i].miny &&
+          clicked_x < widgets[i].minx + widgets[i].width &&
+          clicked_y < widgets[i].miny + widgets[i].height && lmb_down) {
+        widget_selected = i;
+      }
+    }
+
     struct Quadtree q = {0};
     q.w = WIDTH;
     q.h = HEIGHT;
