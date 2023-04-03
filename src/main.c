@@ -280,7 +280,7 @@ void simulate_boids(struct Boid *boids, int num_boids, struct Widget *widgets,
 
   for (int i = 0; i < num_boids; i++) {
 
-    float heading_weight = 1.0;
+    float heading_weight = widgets[3].value;
     float weights[] = {
         widgets[2].value,
         widgets[1].value,
@@ -311,7 +311,7 @@ int main(int argc, char *argv[]) {
   int num_boids = 0;
   struct Boid boids[MAX_BOIDS];
 
-  int num_widgets = 3;
+  int num_widgets = 4;
   struct Widget widgets[num_widgets];
 
   // Typical values:
@@ -332,6 +332,11 @@ int main(int argc, char *argv[]) {
   widgets[2].max = 0.08 * 4;
   widgets[2].value = 0.04;
   snprintf(widgets[2].name, 100, "Separation");
+
+  widgets[3].min = 0.5;
+  widgets[3].max = 4.0;
+  widgets[3].value = 1.0;
+  snprintf(widgets[3].name, 100, "Speed");
 
   float fps = 0;
   int frame = 0;
