@@ -482,6 +482,20 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    if (widget_selected != -1) {
+      widgets[widget_selected].value =
+          (float)(mouse_x - widgets[widget_selected].minx) /
+              (float)widgets[widget_selected].width *
+              (widgets[widget_selected].max - widgets[widget_selected].min) +
+          widgets[widget_selected].min;
+      if (widgets[widget_selected].value < widgets[widget_selected].min) {
+        widgets[widget_selected].value = widgets[widget_selected].min;
+      }
+      if (widgets[widget_selected].value > widgets[widget_selected].max) {
+        widgets[widget_selected].value = widgets[widget_selected].max;
+      }
+    }
+
     struct Quadtree q = {0};
     q.w = WIDTH;
     q.h = HEIGHT;
