@@ -396,16 +396,19 @@ int main(int argc, char *argv[]) {
 
   SDL_Color white = {255, 255, 255};
 
-  static int mouse_x = 0;
-  static int mouse_y = 0;
-
-  int clicked_x = -1;
-  int clicked_y = -1;
-  int clicked_button = -1;
+  int widget_selected = -1;
+  bool lmb_down = false;
 
   SDL_Event event;
   bool running = true;
   while (running) {
+
+    static int mouse_x = 0;
+    static int mouse_y = 0;
+
+    int clicked_x = -1;
+    int clicked_y = -1;
+
     Uint32 begin = SDL_GetTicks();
 
     while (SDL_PollEvent(&event)) {
@@ -420,10 +423,20 @@ int main(int argc, char *argv[]) {
         mouse_y = event.motion.y;
         break;
 
+      case SDL_MOUSEBUTTONUP:
+        if (event.button.button == 1) {
+          widget_selected = -1;
+          lmb_down = false;
+        }
+        break;
+
       case SDL_MOUSEBUTTONDOWN:
-        clicked_x = event.button.x;
-        clicked_y = event.button.y;
-        clicked_button = event.button.button;
+        if (event.button.button == 1) {
+          clicked_x = event.button.x;
+          clicked_y = event.button.y;
+          widget_selected = -1;
+          lmb_down = true;
+        }
         break;
 
       case SDL_KEYDOWN:
