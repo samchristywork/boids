@@ -30,6 +30,8 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
   shade = 0x70;
   SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
   SDL_RenderFillRect(renderer, &r);
+  widget->miny = r.y;
+  widget->height = r.h;
 
   // Border
   r.x = padding;
@@ -48,6 +50,8 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
   shade = 0xd0;
   SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
   SDL_RenderFillRect(renderer, &r);
+  widget->width = r.w;
+  widget->minx = r.x;
 
   // Handle
   r.x = padding + inner_padding + relative_value * (width - inner_padding * 2);
@@ -243,7 +247,8 @@ void rule4(struct Boid *boids, int idx, struct Quadtree *q) {
 }
 
 
-void simulate_boids(struct Boid *boids, int num_boids, struct Quadtree *q) {
+void simulate_boids(struct Boid *boids, int num_boids, struct Widget *widgets,
+                    int num_widgets, struct Quadtree *q) {
 
   for (int i = 0; i < num_boids; i++) {
     boids[i].x += BOID_SPEED * cos(boids[i].currentHeading);
