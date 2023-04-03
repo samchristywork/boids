@@ -33,11 +33,19 @@ void draw_quadtree(SDL_Renderer *renderer, struct Quadtree *q,
                    struct Context parent, struct Context child, int shade,
                    int shade_increment) {
 
+  float x1 = q->x;
+  float y1 = q->y;
+  float x2 = q->x + q->w;
+  float y2 = q->y + q->h;
+
+  transform_to_context(&parent, &child, &x1, &y1);
+  transform_to_context(&parent, &child, &x2, &y2);
+
   SDL_Rect rect;
-  rect.x = q->x;
-  rect.y = q->y;
-  rect.w = q->w;
-  rect.h = q->h;
+  rect.x = x1;
+  rect.y = y1;
+  rect.w = x2 - x1;
+  rect.h = y2 - y1;
 
   SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
   SDL_RenderFillRect(renderer, &rect);
@@ -100,11 +108,14 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
     draw_boid(renderer, &boids[i], parent, child, i);
 
     if (i == 0 && debug_view == true) {
-      aacircleRGBA(renderer, boids[i].x, boids[i].y, RADIUS_MAX, 0xff, 0xff,
-                   0xff, 0xff);
+      float x = boids[i].x;
+      float y = boids[i].y;
+      transform_to_context(&parent, &child, &x, &y);
 
-      aacircleRGBA(renderer, boids[i].x, boids[i].y, RADIUS_MIN, 0xff, 0xff,
-                   0xff, 0xff);
+      float scale = parent.w / child.w;
+
+      aacircleRGBA(renderer, x, y, scale * RADIUS_MAX, 0xff, 0xff, 0xff, 0xff);
+      aacircleRGBA(renderer, x, y, scale * RADIUS_MIN, 0xff, 0xff, 0xff, 0xff);
 
       int ind_len = 10;
       {
@@ -112,6 +123,9 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
         float y1 = boids[i].y;
         float x2 = x1 + ind_len * cos(boids[i].headings[0]);
         float y2 = y1 + ind_len * sin(boids[i].headings[0]);
+
+        transform_to_context(&parent, &child, &x1, &y1);
+        transform_to_context(&parent, &child, &x2, &y2);
         SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
@@ -121,6 +135,9 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
         float y1 = boids[i].y;
         float x2 = x1 + ind_len * cos(boids[i].headings[1]);
         float y2 = y1 + ind_len * sin(boids[i].headings[1]);
+
+        transform_to_context(&parent, &child, &x1, &y1);
+        transform_to_context(&parent, &child, &x2, &y2);
         SDL_SetRenderDrawColor(renderer, 0, 0xff, 0, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
@@ -130,6 +147,9 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
         float y1 = boids[i].y;
         float x2 = x1 + ind_len * cos(boids[i].headings[2]);
         float y2 = y1 + ind_len * sin(boids[i].headings[2]);
+
+        transform_to_context(&parent, &child, &x1, &y1);
+        transform_to_context(&parent, &child, &x2, &y2);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0xff, 0xff);
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
       }
