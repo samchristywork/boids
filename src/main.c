@@ -469,6 +469,11 @@ int main(int argc, char *argv[]) {
 
   SDL_Color white = {255, 255, 255};
 
+  int shade = 0x07;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderClear(renderer);
+  SDL_RenderPresent(renderer);
+
   int widget_selected = -1;
   bool lmb_down = false;
 
