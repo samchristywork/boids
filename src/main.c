@@ -74,7 +74,7 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
   int inner_padding = 50;
 
   float relative_value =
-      (widget->value - widget->min) / (widget->max - widget->min);
+      (widget->value_f - widget->min) / (widget->max - widget->min);
 
   // Outer
   r.x = padding;
@@ -130,7 +130,7 @@ void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
             white, buf);
 
   // Value text
-  snprintf(buf, 100, "%s: %4.4f", widget->name, widget->value);
+  snprintf(buf, 100, "%s: %4.4f", widget->name, widget->value_f);
   draw_text(renderer, font, 225, h - padding - height / 2 - 6, white, buf);
 }
 
@@ -163,7 +163,11 @@ void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
   draw_text(renderer, font, 0, 32, white, num_boids_text);
 
   for (int i = 0; i < num_widgets; i++) {
-    draw_slider(renderer, font, w, h - 30 * i, &widgets[i]);
+    if (widgets[i].type == WIDGET_SLIDER) {
+      draw_slider(renderer, font, w, h - 30 * i, &widgets[i]);
+    } else if (widgets[i].type == WIDGET_CHECKBOX) {
+      draw_checkbox(renderer, font, w, h - 30 * i, &widgets[i]);
+    }
   }
 
   SDL_RenderPresent(renderer);
@@ -334,11 +338,11 @@ void simulate_boids(struct Boid *boids, int num_boids, struct Widget *widgets,
 
   for (int i = 0; i < num_boids; i++) {
 
-    float heading_weight = widgets[3].value;
+    float heading_weight = widgets[3].value_f;
     float weights[] = {
-        widgets[2].value,
-        widgets[1].value,
-        widgets[0].value,
+        widgets[2].value_f,
+        widgets[1].value_f,
+        widgets[0].value_f,
         0.0,
     };
 
@@ -374,22 +378,26 @@ int main(int argc, char *argv[]) {
   // Cohesion   0.0025,
   widgets[0].min = 0.0;
   widgets[0].max = 0.005 * 4;
-  widgets[0].value = 0.0025;
+  widgets[0].value_f = 0.0025;
+  widgets[0].type = WIDGET_SLIDER;
   snprintf(widgets[0].name, 100, "Cohesion");
 
   widgets[1].min = 0.0;
   widgets[1].max = 0.02 * 4;
-  widgets[1].value = 0.01;
+  widgets[1].value_f = 0.01;
+  widgets[1].type = WIDGET_SLIDER;
   snprintf(widgets[1].name, 100, "Alignment");
 
   widgets[2].min = 0.0;
   widgets[2].max = 0.08 * 4;
-  widgets[2].value = 0.04;
+  widgets[2].value_f = 0.04;
+  widgets[2].type = WIDGET_SLIDER;
   snprintf(widgets[2].name, 100, "Separation");
 
   widgets[3].min = 0.5;
   widgets[3].max = 4.0;
-  widgets[3].value = 1.0;
+  widgets[3].value_f = 1.0;
+  widgets[3].type = WIDGET_SLIDER;
   snprintf(widgets[3].name, 100, "Speed");
 
   float fps = 0;
@@ -543,16 +551,18 @@ int main(int argc, char *argv[]) {
     }
 
     if (widget_selected != -1) {
-      widgets[widget_selected].value =
-          (float)(mouse_x - widgets[widget_selected].minx) /
-              (float)widgets[widget_selected].width *
-              (widgets[widget_selected].max - widgets[widget_selected].min) +
-          widgets[widget_selected].min;
-      if (widgets[widget_selected].value < widgets[widget_selected].min) {
-        widgets[widget_selected].value = widgets[widget_selected].min;
-      }
-      if (widgets[widget_selected].value > widgets[widget_selected].max) {
-        widgets[widget_selected].value = widgets[widget_selected].max;
+      if (widgets[widget_selected].type == WIDGET_SLIDER) {
+        widgets[widget_selected].value_f =
+            (float)(mouse_x - widgets[widget_selected].minx) /
+                (float)widgets[widget_selected].width *
+                (widgets[widget_selected].max - widgets[widget_selected].min) +
+            widgets[widget_selected].min;
+        if (widgets[widget_selected].value_f < widgets[widget_selected].min) {
+          widgets[widget_selected].value_f = widgets[widget_selected].min;
+        }
+        if (widgets[widget_selected].value_f > widgets[widget_selected].max) {
+          widgets[widget_selected].value_f = widgets[widget_selected].max;
+        }
       }
     }
 
