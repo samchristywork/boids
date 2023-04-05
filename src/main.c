@@ -10,6 +10,45 @@
 #include <quadtree.h>
 #include <render.h>
 
+void draw_checkbox(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
+                   struct Widget *widget) {
+  SDL_Rect r;
+  int shade;
+  int width = 20;
+  int height = 20;
+  int padding = 10;
+
+  // Outer
+  r.x = padding;
+  r.y = h - padding - height;
+  r.w = width;
+  r.h = height;
+  shade = 0x70;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+
+  // Border
+  r.x = padding;
+  r.y = h - padding - height;
+  r.w = width;
+  r.h = height;
+  shade = 0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderDrawRect(renderer, &r);
+
+  // Inner
+  if (widget->value_b) {
+    int foo = 6;
+    r.x = padding + foo;
+    r.y = h - padding - height + foo;
+    r.w = width - foo * 2;
+    r.h = height - foo * 2;
+    shade = 0xd0;
+    SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+    SDL_RenderFillRect(renderer, &r);
+  }
+}
+
 void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
                  struct Widget *widget) {
   SDL_Rect r;
