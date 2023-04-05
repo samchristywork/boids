@@ -26,6 +26,10 @@ void draw_checkbox(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
   shade = 0x70;
   SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
   SDL_RenderFillRect(renderer, &r);
+  widget->minx = r.x;
+  widget->miny = r.y;
+  widget->width = r.w;
+  widget->height = r.h;
 
   // Border
   r.x = padding;
