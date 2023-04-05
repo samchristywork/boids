@@ -369,7 +369,7 @@ int main(int argc, char *argv[]) {
   int num_boids = 0;
   struct Boid boids[MAX_BOIDS];
 
-  int num_widgets = 4;
+  int num_widgets = 5;
   struct Widget widgets[num_widgets];
 
   // Typical values:
@@ -400,6 +400,10 @@ int main(int argc, char *argv[]) {
   widgets[3].type = WIDGET_SLIDER;
   snprintf(widgets[3].name, 100, "Speed");
 
+  widgets[4].value_b = false;
+  widgets[4].type = WIDGET_CHECKBOX;
+  snprintf(widgets[4].name, 100, "Paused");
+
   float fps = 0;
   int frame = 0;
   int target_fps = 0;
@@ -419,6 +423,7 @@ int main(int argc, char *argv[]) {
   bool debug_view = get_is_set('d');
   bool paused = get_is_set('p');
   bool dynamic = get_is_set('y');
+  widgets[4].value_b = paused;
 
   if (get_value('f')) {
     target_fps = atoi(get_value('f'));
@@ -525,6 +530,7 @@ int main(int argc, char *argv[]) {
 
         case SDLK_SPACE:
           paused = !paused;
+          widgets[4].value_b = paused;
           break;
 
         default:
@@ -563,7 +569,15 @@ int main(int argc, char *argv[]) {
         if (widgets[widget_selected].value_f > widgets[widget_selected].max) {
           widgets[widget_selected].value_f = widgets[widget_selected].max;
         }
+      } else if (widgets[widget_selected].type == WIDGET_CHECKBOX) {
+        lmb_down = false;
+        widgets[widget_selected].value_b = !widgets[widget_selected].value_b;
+        widget_selected = -1;
       }
+    }
+
+    if (widgets[4].value_b != paused) {
+      paused = !paused;
     }
 
     struct Quadtree q = {0};
