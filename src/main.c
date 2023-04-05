@@ -152,15 +152,15 @@ void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
 
   char frame_text[256];
   snprintf(frame_text, 255, "Frame: %d", frame);
-  draw_text(renderer, font, 0, 0, white, frame_text);
+  draw_text(renderer, font, 5, 5, white, frame_text);
 
   char framerate_text[256];
   snprintf(framerate_text, 255, "FPS: %d", (int)fps);
-  draw_text(renderer, font, 0, 16, white, framerate_text);
+  draw_text(renderer, font, 5, 16 + 5, white, framerate_text);
 
   char num_boids_text[256];
   snprintf(num_boids_text, 255, "Boids: %d", (int)num_boids);
-  draw_text(renderer, font, 0, 32, white, num_boids_text);
+  draw_text(renderer, font, 5, 32 + 5, white, num_boids_text);
 
   for (int i = 0; i < num_widgets; i++) {
     if (widgets[i].type == WIDGET_SLIDER) {
@@ -600,7 +600,7 @@ int main(int argc, char *argv[]) {
     child.w = WIDTH;
     child.h = HEIGHT;
 
-    if (lmb_down) {
+    if (lmb_down && widget_selected == -1) {
       child.x = -mouse_x + WIDTH / 8;
       child.y = -mouse_y + HEIGHT / 8;
       child.w = WIDTH / 4;

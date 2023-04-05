@@ -1,7 +1,7 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 
-#define QUADTREE_MAX_CHILDREN 10
+#define QUADTREE_MAX_CHILDREN 1
 
 struct QuadtreePoint {
   float x;
