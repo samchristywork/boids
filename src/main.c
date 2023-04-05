@@ -51,6 +51,17 @@ void draw_checkbox(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
     SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
     SDL_RenderFillRect(renderer, &r);
   }
+
+  SDL_Color white = {0xff, 0xff, 0xff, 0xff};
+
+  // Value text
+  char buf[100];
+  if (widget->value_b) {
+    snprintf(buf, 100, "%s: True", widget->name);
+  } else {
+    snprintf(buf, 100, "%s: False", widget->name);
+  }
+  draw_text(renderer, font, 40, h - padding - height / 2 - 6, white, buf);
 }
 
 void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
