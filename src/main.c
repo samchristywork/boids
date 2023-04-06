@@ -462,8 +462,6 @@ int main(int argc, char *argv[]) {
     srand(time(0));
   }
 
-  num_boids = initialize_positions(boids, target_boids);
-
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   TTF_Init();
 
@@ -478,6 +476,8 @@ int main(int argc, char *argv[]) {
   }
 
   SDL_GetWindowSize(window, &screen_width, &screen_height);
+
+  num_boids = initialize_positions(boids, target_boids); // NOCOMMIT
 
   SDL_Renderer *renderer =
       SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
