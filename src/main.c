@@ -421,6 +421,7 @@ int main(int argc, char *argv[]) {
   add_arg('n', "num", "Number of boids in simulation (default 256).");
   add_arg('p', "pause", "Start paused.");
   add_arg('s', "seed", "Seed to use for random generation.");
+  add_arg('u', "fullscreen", "Fullscreen mode.");
   add_arg('y', "dynamic",
           "Number of boids dynamically changes based on framerate.");
 
@@ -428,8 +429,9 @@ int main(int argc, char *argv[]) {
 
   bool cap_framerate = !get_is_set('c');
   bool debug_view = get_is_set('d');
-  bool paused = get_is_set('p');
   bool dynamic = get_is_set('y');
+  bool fullscreen = get_is_set('u');
+  bool paused = get_is_set('p');
   widgets[4].value_b = paused;
 
   if (get_value('f')) {
@@ -470,6 +472,12 @@ int main(int argc, char *argv[]) {
   SDL_Window *window = SDL_CreateWindow("Boids", SDL_WINDOWPOS_UNDEFINED,
                                         SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height,
                                         SDL_WINDOW_SHOWN);
+
+  if (fullscreen) {
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+  }
+
+  SDL_GetWindowSize(window, &screen_width, &screen_height);
 
   SDL_Renderer *renderer =
       SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
