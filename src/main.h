@@ -14,7 +14,7 @@ struct Boid {
 };
 
 struct Widget {
-  char name[100];
+  char name[50];
   float min;
   float max;
   float value_f;
