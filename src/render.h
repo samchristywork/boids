@@ -10,8 +10,6 @@
 #define BOID_LENGTH 4
 #define BOID_SPEED .25
 #define MAX_BOIDS 10000
-#define WIDTH 1200
-#define HEIGHT 700
 #define RADIUS_MAX 20
 #define RADIUS_MIN 5
 #define BOID_SHADE 0x9f

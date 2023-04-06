@@ -10,6 +10,9 @@
 #include <quadtree.h>
 #include <render.h>
 
+int screen_width=1200;
+int screen_height=700;
+
 void draw_checkbox(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
                    struct Widget *widget) {
   SDL_Rect r;
@@ -179,8 +182,8 @@ float random_float(float low, float high) {
 
 void add_boid(struct Boid *boids, int *num_boids) {
   if (*num_boids < MAX_BOIDS) {
-    boids[*num_boids].x = random_float(0, WIDTH);
-    boids[*num_boids].y = random_float(0, HEIGHT);
+    boids[*num_boids].x = random_float(0, screen_width);
+    boids[*num_boids].y = random_float(0, screen_height);
     boids[*num_boids].currentHeading = random_float(0, 3.141 * 2);
     (*num_boids)++;
   }
@@ -315,17 +318,17 @@ void simulate_boids(struct Boid *boids, int num_boids, struct Widget *widgets,
 
   for (int i = 0; i < num_boids; i++) {
 
-    if (boids[i].x > WIDTH) {
+    if (boids[i].x > screen_width) {
       boids[i].x = 0;
     }
     if (boids[i].x < 0) {
-      boids[i].x = WIDTH;
+      boids[i].x = screen_width;
     }
-    if (boids[i].y > HEIGHT) {
+    if (boids[i].y > screen_height) {
       boids[i].y = 0;
     }
     if (boids[i].y < 0) {
-      boids[i].y = HEIGHT;
+      boids[i].y = screen_height;
     }
   }
 
@@ -458,8 +461,10 @@ int main(int argc, char *argv[]) {
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   TTF_Init();
 
+  screen_width = 1200;
+  screen_height = 700;
   SDL_Window *window = SDL_CreateWindow("Boids", SDL_WINDOWPOS_UNDEFINED,
-                                        SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,
+                                        SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height,
                                         SDL_WINDOW_SHOWN);
 
   SDL_Renderer *renderer =
@@ -586,8 +591,8 @@ int main(int argc, char *argv[]) {
     }
 
     struct Quadtree q = {0};
-    q.w = WIDTH;
-    q.h = HEIGHT;
+    q.w = screen_width;
+    q.h = screen_height;
 
     for (int i = 0; i < target_boids; i++) {
       quadtree_insert(&q, i, boids[i].x, boids[i].y);
@@ -596,8 +601,8 @@ int main(int argc, char *argv[]) {
     struct Context parent;
     parent.x = 0;
     parent.y = 0;
-    parent.w = WIDTH;
-    parent.h = HEIGHT;
+    parent.w = screen_width;
+    parent.h = screen_height;
 
     struct Context child;
     child.x = 0;
