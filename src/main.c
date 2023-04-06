@@ -372,7 +372,7 @@ int main(int argc, char *argv[]) {
   int num_boids = 0;
   struct Boid boids[MAX_BOIDS];
 
-  int num_widgets = 5;
+  int num_widgets = 6;
   struct Widget widgets[num_widgets];
 
   // Typical values:
@@ -406,6 +406,10 @@ int main(int argc, char *argv[]) {
   widgets[4].value_b = false;
   widgets[4].type = WIDGET_CHECKBOX;
   snprintf(widgets[4].name, 100, "Paused");
+
+  widgets[5].value_b = false;
+  widgets[5].type = WIDGET_CHECKBOX;
+  snprintf(widgets[5].name, 100, "Follow mode");
 
   float fps = 0;
   int frame = 0;
@@ -607,14 +611,19 @@ int main(int argc, char *argv[]) {
     struct Context child;
     child.x = 0;
     child.y = 0;
-    child.w = WIDTH;
-    child.h = HEIGHT;
+    child.w = screen_width;
+    child.h = screen_height;
 
-    if (lmb_down && widget_selected == -1) {
-      child.x = -mouse_x + WIDTH / 8;
-      child.y = -mouse_y + HEIGHT / 8;
-      child.w = WIDTH / 4;
-      child.h = HEIGHT / 4;
+    if (widgets[5].value_b && num_boids > 0) {
+      child.x = -boids[0].x + screen_width / 8;
+      child.y = -boids[0].y + screen_height / 8;
+      child.w = screen_width / 4;
+      child.h = screen_height / 4;
+    } else if (lmb_down && widget_selected == -1) {
+      child.x = -mouse_x + screen_width / 8;
+      child.y = -mouse_y + screen_height / 8;
+      child.w = screen_width / 4;
+      child.h = screen_height / 4;
     }
 
     render(renderer, window, boids, num_boids, widgets, num_widgets, parent,
