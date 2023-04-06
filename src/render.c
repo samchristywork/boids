@@ -107,7 +107,7 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
   for (int i = 0; i < num_boids; i++) {
     draw_boid(renderer, &boids[i], parent, child, i);
 
-    if (i == 0 && debug_view == true) {
+    if (i == 0 && debug_view == true && num_boids > 0) {
       float x = boids[i].x;
       float y = boids[i].y;
       transform_to_context(&parent, &child, &x, &y);
