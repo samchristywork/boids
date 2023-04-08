@@ -23,6 +23,12 @@ struct Context {
   float h;
 };
 
+void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
+            int num_boids, struct Widget *widgets, int num_widgets,
+            struct Context parent, struct Context child, int frame, int fps,
+            SDL_Color white, struct Quadtree *q, TTF_Font *font,
+            bool debug_view);
+
 void draw_text(SDL_Renderer *renderer, TTF_Font *font, int x, int y,
                SDL_Color color, char *text);
 

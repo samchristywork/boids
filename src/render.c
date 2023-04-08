@@ -156,3 +156,166 @@ void draw_boids(SDL_Renderer *renderer, struct Boid boids[], int num_boids,
     }
   }
 }
+
+void draw_checkbox(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
+                   struct Widget *widget) {
+  SDL_Rect r;
+  int shade;
+  int width = 20;
+  int height = 20;
+  int padding = 10;
+
+  // Outer
+  r.x = padding;
+  r.y = h - padding - height;
+  r.w = width;
+  r.h = height;
+  shade = 0x70;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+  widget->minx = r.x;
+  widget->miny = r.y;
+  widget->width = r.w;
+  widget->height = r.h;
+
+  // Border
+  r.x = padding;
+  r.y = h - padding - height;
+  r.w = width;
+  r.h = height;
+  shade = 0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderDrawRect(renderer, &r);
+
+  // Inner
+  if (widget->value_b) {
+    int foo = 6;
+    r.x = padding + foo;
+    r.y = h - padding - height + foo;
+    r.w = width - foo * 2;
+    r.h = height - foo * 2;
+    shade = 0xd0;
+    SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+    SDL_RenderFillRect(renderer, &r);
+  }
+
+  SDL_Color white = {0xff, 0xff, 0xff, 0xff};
+
+  // Value text
+  char buf[100];
+  if (widget->value_b) {
+    snprintf(buf, 100, "%s: True", widget->name);
+  } else {
+    snprintf(buf, 100, "%s: False", widget->name);
+  }
+  draw_text(renderer, font, 40, h - padding - height / 2 - 6, white, buf);
+}
+
+void draw_slider(SDL_Renderer *renderer, TTF_Font *font, int w, int h,
+                 struct Widget *widget) {
+  SDL_Rect r;
+  int shade;
+  int width = 200;
+  int height = 20;
+  int padding = 10;
+  int inner_padding = 50;
+
+  float relative_value =
+      (widget->value_f - widget->min) / (widget->max - widget->min);
+
+  // Outer
+  r.x = padding;
+  r.y = h - padding - height;
+  r.w = width;
+  r.h = height;
+  shade = 0x70;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+  widget->miny = r.y;
+  widget->height = r.h;
+
+  // Border
+  r.x = padding;
+  r.y = h - padding - height;
+  r.w = width;
+  r.h = height;
+  shade = 0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderDrawRect(renderer, &r);
+
+  // Inner
+  r.x = padding + inner_padding;
+  r.y = h - padding - height + height / 2 - 2;
+  r.w = width - inner_padding * 2;
+  r.h = 4;
+  shade = 0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+  widget->width = r.w;
+  widget->minx = r.x;
+
+  // Handle
+  r.x = padding + inner_padding + relative_value * (width - inner_padding * 2);
+  r.y = h - padding - height + height / 2 - 4;
+  r.w = 4;
+  r.h = 8;
+  shade = 0xd0;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderFillRect(renderer, &r);
+
+  SDL_Color white = {0xff, 0xff, 0xff, 0xff};
+
+  // Left text
+  char buf[100];
+  snprintf(buf, 10, "%4.4f", widget->min);
+  draw_text(renderer, font, padding + 4, h - padding - height / 2 - 6, white,
+            buf);
+
+  // Right text
+  snprintf(buf, 10, "%4.4f", widget->max);
+  draw_text(renderer, font, padding + width - 42, h - padding - height / 2 - 6,
+            white, buf);
+
+  // Value text
+  snprintf(buf, 100, "%s: %4.4f", widget->name, widget->value_f);
+  draw_text(renderer, font, 225, h - padding - height / 2 - 6, white, buf);
+}
+
+void render(SDL_Renderer *renderer, SDL_Window *window, struct Boid *boids,
+            int num_boids, struct Widget *widgets, int num_widgets,
+            struct Context parent, struct Context child, int frame, int fps,
+            SDL_Color white, struct Quadtree *q, TTF_Font *font,
+            bool debug_view) {
+
+  int w;
+  int h;
+  SDL_GetWindowSize(window, &w, &h);
+
+  int shade = 0x07;
+  SDL_SetRenderDrawColor(renderer, shade, shade, shade, 0xff);
+  SDL_RenderClear(renderer);
+
+  draw_boids(renderer, boids, num_boids, parent, child, debug_view, q);
+
+  char frame_text[256];
+  snprintf(frame_text, 255, "Frame: %d", frame);
+  draw_text(renderer, font, 5, 5, white, frame_text);
+
+  char framerate_text[256];
+  snprintf(framerate_text, 255, "FPS: %d", (int)fps);
+  draw_text(renderer, font, 5, 16 + 5, white, framerate_text);
+
+  char num_boids_text[256];
+  snprintf(num_boids_text, 255, "Boids: %d", (int)num_boids);
+  draw_text(renderer, font, 5, 32 + 5, white, num_boids_text);
+
+  for (int i = 0; i < num_widgets; i++) {
+    if (widgets[i].type == WIDGET_SLIDER) {
+      draw_slider(renderer, font, w, h - 30 * i, &widgets[i]);
+    } else if (widgets[i].type == WIDGET_CHECKBOX) {
+      draw_checkbox(renderer, font, w, h - 30 * i, &widgets[i]);
+    }
+  }
+
+  SDL_RenderPresent(renderer);
+}
