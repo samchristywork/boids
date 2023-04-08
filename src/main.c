@@ -10,6 +10,10 @@
 #include <quadtree.h>
 #include <render.h>
 
+struct ScreenSize {
+  int width;
+  int height;
+} screen_size = {1200, 700};
 
 float random_float(float low, float high) {
   return low + (high - low) * (float)rand() / (float)RAND_MAX;
@@ -17,8 +21,8 @@ float random_float(float low, float high) {
 
 void add_boid(struct Boid *boids, int *num_boids) {
   if (*num_boids < MAX_BOIDS) {
-    boids[*num_boids].x = random_float(0, screen_width);
-    boids[*num_boids].y = random_float(0, screen_height);
+    boids[*num_boids].x = random_float(0, screen_size.width);
+    boids[*num_boids].y = random_float(0, screen_size.height);
     boids[*num_boids].currentHeading = random_float(0, 3.141 * 2);
     (*num_boids)++;
   }
@@ -153,17 +157,17 @@ void simulate_boids(struct Boid *boids, int num_boids, struct Widget *widgets,
 
   for (int i = 0; i < num_boids; i++) {
 
-    if (boids[i].x > screen_width) {
+    if (boids[i].x > screen_size.width) {
       boids[i].x = 0;
     }
     if (boids[i].x < 0) {
-      boids[i].x = screen_width;
+      boids[i].x = screen_size.width;
     }
-    if (boids[i].y > screen_height) {
+    if (boids[i].y > screen_size.height) {
       boids[i].y = 0;
     }
     if (boids[i].y < 0) {
-      boids[i].y = screen_height;
+      boids[i].y = screen_size.height;
     }
   }
 
@@ -300,19 +304,19 @@ int main(int argc, char *argv[]) {
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
   TTF_Init();
 
-  screen_width = 1200;
-  screen_height = 700;
+  screen_size.width = 1200;
+  screen_size.height = 700;
   SDL_Window *window = SDL_CreateWindow("Boids", SDL_WINDOWPOS_UNDEFINED,
-                                        SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height,
+                                        SDL_WINDOWPOS_UNDEFINED, screen_size.width, screen_size.height,
                                         SDL_WINDOW_SHOWN);
 
   if (fullscreen) {
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
   }
 
-  SDL_GetWindowSize(window, &screen_width, &screen_height);
+  SDL_GetWindowSize(window, &screen_size.width, &screen_size.height);
 
-  num_boids = initialize_positions(boids, target_boids); // NOCOMMIT
+  num_boids = initialize_positions(boids, target_boids);
 
   SDL_Renderer *renderer =
       SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -438,8 +442,8 @@ int main(int argc, char *argv[]) {
     }
 
     struct Quadtree q = {0};
-    q.w = screen_width;
-    q.h = screen_height;
+    q.w = screen_size.width;
+    q.h = screen_size.height;
 
     for (int i = 0; i < target_boids; i++) {
       quadtree_insert(&q, i, boids[i].x, boids[i].y);
@@ -448,25 +452,25 @@ int main(int argc, char *argv[]) {
     struct Context parent;
     parent.x = 0;
     parent.y = 0;
-    parent.w = screen_width;
-    parent.h = screen_height;
+    parent.w = screen_size.width;
+    parent.h = screen_size.height;
 
     struct Context child;
     child.x = 0;
     child.y = 0;
-    child.w = screen_width;
-    child.h = screen_height;
+    child.w = screen_size.width;
+    child.h = screen_size.height;
 
     if (widgets[5].value_b && num_boids > 0) {
-      child.x = -boids[0].x + screen_width / 8;
-      child.y = -boids[0].y + screen_height / 8;
-      child.w = screen_width / 4;
-      child.h = screen_height / 4;
+      child.x = -boids[0].x + screen_size.width / 8;
+      child.y = -boids[0].y + screen_size.height / 8;
+      child.w = screen_size.width / 4;
+      child.h = screen_size.height / 4;
     } else if (lmb_down && widget_selected == -1) {
-      child.x = -mouse_x + screen_width / 8;
-      child.y = -mouse_y + screen_height / 8;
-      child.w = screen_width / 4;
-      child.h = screen_height / 4;
+      child.x = -mouse_x + screen_size.width / 8;
+      child.y = -mouse_y + screen_size.height / 8;
+      child.w = screen_size.width / 4;
+      child.h = screen_size.height / 4;
     }
 
     render(renderer, window, boids, num_boids, widgets, num_widgets, parent,
