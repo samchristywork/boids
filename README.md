@@ -37,9 +37,20 @@ structured.
 
 ## Usage
 
-## Dependencies
+```
+Usage: ./main
+  -c,--no-cap-framerate  Start with a uncapped framerate.
+  -d,--debug             Start with debug view enabled.
+  -f,--fps               Target FPS (default 60).
+  -h,--help              Display Usage statement.
+  -n,--num               Number of boids in simulation (default 256).
+  -p,--pause             Start paused.
+  -s,--seed              Seed to use for random generation.
+  -u,--fullscreen        Fullscreen mode.
+  -y,--dynamic           Number of boids dynamically changes based on framerate.
+```
 
-## Limitations
+## Dependencies
 
 ## License
 
