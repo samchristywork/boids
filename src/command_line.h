@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <version.h>
 
 struct Argument {
   char *longName;
@@ -72,9 +73,18 @@ void usage() {
   exit(EXIT_SUCCESS);
 }
 
+void version() {
+  printf("%s\n\n", VERSION_STRING);
+  printf("%s\n", LICENSE_STRING);
+
+  exit(EXIT_SUCCESS);
+}
+
 void parse_opts(int argc, char *argv[]) {
   add_arg('h', "help", "Display Usage statement.");
+  add_arg('v', "version", "Display Version and License information.");
   set_arg_function(usage, 'h');
+  set_arg_function(version, 'v');
 
   int last_arg = -1;
 
