@@ -22,6 +22,10 @@ structured.
 
 ## Screenshots
 
+<p align="center">
+  <img src="./res/screenshot.png" />
+</p>
+
 ## Features
 
 - Simulation of the Boids swarming algorithm
