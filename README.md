@@ -52,6 +52,14 @@ Usage: ./main
 
 ## Dependencies
 
+```
+gcc
+libsdl2-dev
+libsdl2-gfx-dev
+libsdl2-ttf-dev
+make
+```
+
 ## License
 
 This work is licensed under the GNU General Public License version 3 (GPLv3).
